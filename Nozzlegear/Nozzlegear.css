@@ -1,0 +1,66 @@
+﻿body {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+span {
+    font-style: italic;
+}
+
+.Nozzlegear-container{
+    padding:0 5px 5px 5px;
+    border-top-left-radius: 6px;
+    border-top-right-radius:6px;
+}
+
+.Nozzlegear-content{
+    background:#fff;
+    border-radius:6px;
+    padding:15px;
+}
+
+.Nozzlegear-content > p.Nozzlegear-message{
+    margin:0 0 15px 0;
+}
+
+.Nozzlegear-form{
+
+}
+
+.Nozzlegear-form > .Nozzlegear-form-group{
+    padding:5px 0;
+}
+
+.Nozzlegear-form > .Nozzlegear-form-group > input{
+    display:block !important;
+    width:100% !important;
+    font-size:14px !important;
+    margin:0 !important;
+    padding: 6px !important;
+    height:auto !important;
+    color:#333 !important;
+    border:1px solid #c4c4c4 !important;
+    box-shadow:inset 0px 0px 3px rgba(0,0,0,0.18) !important;
+    border-radius:4px !important;
+    box-sizing:border-box !important;
+    background-image:none !important;
+}
+
+.Nozzlegear-form > .Nozzlegear-button{
+    margin: 15px 0 0 0;
+}
+
+.Nozzlegear-hide{
+    display:none;
+}
+
+a.Nozzlegear-toggle{
+    color:#fff;
+    text-decoration:none;
+    display:block;
+    padding:10px;
+}
+
+a.Nozzlegear-toggle > h2{
+    margin:0;
+    padding:0;
+}

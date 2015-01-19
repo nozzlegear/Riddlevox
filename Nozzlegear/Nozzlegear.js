@@ -58,13 +58,13 @@ var Nozzlegear = (function () {
         //Append the form to the document
         document.body.appendChild(this._form);
     }
-    Nozzlegear.prototype.Show = function () {
+    Nozzlegear.prototype.Open = function () {
         //Show form by removing the untoggled class
         this._form.classList.remove("Nozzlegear-untoggled");
         this._hasBeenShow = true;
         return this;
     };
-    Nozzlegear.prototype.Hide = function () {
+    Nozzlegear.prototype.Close = function () {
         //Hide form by adding the untoggled class
         this._form.classList.add("Nozzlegear-untoggled");
         return this;
@@ -78,13 +78,13 @@ var Nozzlegear = (function () {
                 if (_this.options.OpenDelay < 0) {
                 }
                 else if (_this.options.OpenDelay === 0) {
-                    _this.Show();
+                    _this.Open();
                 }
                 else {
                     //Must use lambda syntax here to preserve 'this' both in the function and in .Show
                     setTimeout(function () {
                         if (!_this._hasBeenShow) {
-                            _this.Show();
+                            _this.Open();
                         }
                         ;
                     }, _this.options.OpenDelay);

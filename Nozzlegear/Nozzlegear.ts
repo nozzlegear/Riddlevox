@@ -1,6 +1,6 @@
 ﻿interface INozzlegear {
-    Show: () => void;
-    Hide: () => void;
+    Open: () => void;
+    Close: () => void;
     Start: () => INozzlegear;
 }
 
@@ -65,7 +65,7 @@ class Nozzlegear implements INozzlegear {
         document.body.appendChild(this._form);
     }
 
-    public Show(): INozzlegear {
+    public Open(): INozzlegear {
         //Show form by removing the untoggled class
         this._form.classList.remove("Nozzlegear-untoggled");
         this._hasBeenShow = true;
@@ -73,7 +73,7 @@ class Nozzlegear implements INozzlegear {
         return this;
     }
 
-    public Hide(): INozzlegear {
+    public Close(): INozzlegear {
         //Hide form by adding the untoggled class
         this._form.classList.add("Nozzlegear-untoggled");
 
@@ -91,11 +91,11 @@ class Nozzlegear implements INozzlegear {
                     //Never open if value is less than 0, instead wait for .Show
                 }
                 else if (this.options.OpenDelay === 0) {
-                    this.Show();
+                    this.Open();
                 }
                 else {
                     //Must use lambda syntax here to preserve 'this' both in the function and in .Show
-                    setTimeout(() => { if (!this._hasBeenShow) { this.Show(); }; }, this.options.OpenDelay);
+                    setTimeout(() => { if (!this._hasBeenShow) { this.Open(); }; }, this.options.OpenDelay);
                 };
             };
 

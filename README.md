@@ -3,7 +3,7 @@ Nozzlegear is an open-source Javascript library that will help you capture more 
 
 ##Usage
 
-**NB: ** This section will be updated with better documentation upon the 1.0 release.**
+**NB:** This section will be updated with better documentation upon the 1.0 release.
 
 ```
 var options = {

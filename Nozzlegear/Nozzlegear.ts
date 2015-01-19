@@ -1,23 +1,16 @@
-﻿enum NozzlegearPosition {
-    BottomLeft,
-    Bottom,
-    BottomRight
-};
-
-interface INozzlegear {
+﻿interface INozzlegear {
     Show: () => void;
     Hide: () => void;
     Start: () => INozzlegear;
 }
 
-interface INozzlegearOptions {
-    Position: NozzlegearPosition;
-    Title: string;
-    Message: string;
-    ButtonText: string;
-    BackgroundColor: string;
-    InitialDelay: number;
-    OpenDelay: number;
+interface INozzlegearFormOptions {
+    ActionUrl?: string;
+    Method?: string;
+    FirstNameControlName?: string;
+    LastNameControlName?: string;
+    FullNameControlName?: string;
+    EmailAddressControlName?: string;
     CaptureFirstName: boolean;
     CaptureLastName: boolean;
     CaptureFullName: boolean;
@@ -28,16 +21,24 @@ interface INozzlegearOptions {
     RequireEmailAddress: boolean;
 }
 
-class Nozzlegear implements INozzlegear {
-    constructor(position?: string, private options?: INozzlegearOptions) {
-        this.options = this._checkDefaults(position, options);
+interface INozzlegearOptions {
+    Position: string;
+    FormOptions: INozzlegearFormOptions;
+    Title: string;
+    Message: string;
+    ButtonText: string;
+    BackgroundColor: string;
+    InitialDelay: number;
+    OpenDelay: number;
+    OnConversion: (form: HTMLFormElement, controls: NodeListOf<HTMLInputElement>) => boolean;
+}
 
-        //Prepare a unique id to get a reference to the form after appending it to the body
-        var uid = "Nozzlegear-" + Math.random();
+class Nozzlegear implements INozzlegear {
+    constructor(private options?: INozzlegearOptions) {
+        this.options = this._checkDefaults(options);
 
         //Build template and append to body
         this._form = document.createElement("div");
-        this._form.id = uid;
         this._form.classList.add("Nozzlegear-container");
         this._form.classList.add("Nozzlegear-hide");
         this._form.classList.add("Nozzlegear-untoggled");
@@ -45,48 +46,34 @@ class Nozzlegear implements INozzlegear {
         this._form.innerHTML = this._template;
 
         //Determine position
-        if (this.options.Position === NozzlegearPosition.BottomLeft) this._form.classList.add("Nozzlegear-bottom-left");
-        if (this.options.Position === NozzlegearPosition.BottomRight) this._form.classList.add("Nozzlegear-bottom-right");
+        if (this.options.Position === "bottom-left") this._form.classList.add("Nozzlegear-bottom-left");
+        if (this.options.Position === "bottom-right") this._form.classList.add("Nozzlegear-bottom-right");
 
         //Set the content
         this._form.getElementsByClassName("Nozzlegear-title").item(0).textContent = this.options.Title;
         this._form.getElementsByClassName("Nozzlegear-message").item(0).textContent = this.options.Message;
         this._form.getElementsByClassName("Nozzlegear-button").item(0).textContent = this.options.ButtonText;
 
-        var it = this;
-        var hideControl = function (name: string) {
-            (<HTMLElement> it._form.getElementsByClassName(name).item(0)).classList.add("Nozzlegear-hide");
-        };
+        //Configure form options
+        this._configureFormOptions(this.options.FormOptions);
 
-        //Show or hide form controls
-        if (!this.options.CaptureEmailAddress) hideControl("Nozzlegear-email-capture");
-        if (!this.options.CaptureFirstName) hideControl("Nozzlegear-fname-capture");
-        if (!this.options.CaptureLastName) hideControl("Nozzlegear-lname-capture");
-        if (!this.options.CaptureFullName) hideControl("Nozzlegear-fullname-capture");
-
-        //Wire up click listeners
-        (<HTMLElement>this._form.getElementsByClassName("Nozzlegear-button").item(0)).addEventListener("click", this._onClick);
-        (<HTMLElement>this._form.getElementsByClassName("Nozzlegear-toggle").item(0)).addEventListener("click", this.Show);
+        //Wire up click listeners. Lambda syntax preserves 'this'.
+        (<HTMLElement>this._form.getElementsByClassName("Nozzlegear-button").item(0)).addEventListener("click", (e) => { this._onButtonClick(e); }, true);
+        (<HTMLElement>this._form.getElementsByClassName("Nozzlegear-toggle").item(0)).addEventListener("click", (e) => { this._toggle(e); }, true);
 
         //Append the form to the document
         document.body.appendChild(this._form);
-
-        //Form reference is lost after appending. Get it back
-        this._form = document.getElementById(uid);
     }
 
-    public Show(e?: MouseEvent): INozzlegear {
-        if (e) e.preventDefault();
-        this.Hide();
+    public Show(): INozzlegear {
         //Show form by removing the untoggled class
         this._form.classList.remove("Nozzlegear-untoggled");
+        this._hasBeenShow = true;
 
         return this;
     }
 
-    public Hide(e?: MouseEvent): INozzlegear {
-        if (e) e.preventDefault();
-
+    public Hide(): INozzlegear {
         //Hide form by adding the untoggled class
         this._form.classList.add("Nozzlegear-untoggled");
 
@@ -96,20 +83,20 @@ class Nozzlegear implements INozzlegear {
     public Start(): INozzlegear {
         if (!this._isStarted) {
             this._isStarted = true;
-            var it = this;
 
-            var peakForm = function () {
-                it._form.classList.remove("Nozzlegear-hide");
+            var peakForm = () => {
+                this._form.classList.remove("Nozzlegear-hide");
 
-                if (it.options.OpenDelay < 0) {
+                if (this.options.OpenDelay < 0) {
                     //Never open if value is less than 0, instead wait for .Show
                 }
-                else if (it.options.OpenDelay === 0) {
-                    it.Show();
+                else if (this.options.OpenDelay === 0) {
+                    this.Show();
                 }
                 else {
-                    setTimeout(it.Show, it.options.OpenDelay);
-                }
+                    //Must use lambda syntax here to preserve 'this' both in the function and in .Show
+                    setTimeout(() => { if (!this._hasBeenShow) { this.Show(); }; }, this.options.OpenDelay);
+                };
             };
 
             if (this.options.InitialDelay === 0) {
@@ -123,39 +110,39 @@ class Nozzlegear implements INozzlegear {
         return this;
     }
 
-    private _onClick = function (e: MouseEvent) {
-        e.preventDefault();
-
-        // TODO: Invoke the user's OnConversion handler
-    }
-
     //#region Utility variables
 
     private _isStarted: boolean = false;
+    private _hasBeenShow: boolean = false;
 
     private _defaultOptions: INozzlegearOptions = {
-        Position: NozzlegearPosition.BottomRight,
+        Position: "bottom-right",
+        FormOptions: {
+            CaptureEmailAddress: true,
+            CaptureFirstName: true,
+            CaptureFullName: false,
+            CaptureLastName: false,
+            RequireEmailAddress: true,
+            RequireFirstName: false,
+            RequireLastName: false,
+            RequireFullName: false,
+        },
         Title: "Sign up for our mailing list!",
         Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         ButtonText: "Sign up!",
         BackgroundColor: "#34495e",
         OpenDelay: 5000,
         InitialDelay: 1000,
-        CaptureEmailAddress: true,
-        CaptureFirstName: true,
-        CaptureFullName: false,
-        CaptureLastName: false,
-        RequireEmailAddress: true,
-        RequireFirstName: false,
-        RequireLastName: false,
-        RequireFullName: false,
+        OnConversion: (form, controls) => {
+            return true;
+        }
     };
 
     private _form: HTMLElement;
 
     //#region Template
 
-    private _template: string = "<div class='Nozzlegear-header'><a class='Nozzlegear-toggle' href='#'><h2 class='Nozzlegear-title'></h2><span class='Nozzlegear-arrow-up'></span><span class='Nozzlegear-arrow-down'></span></a></div><div class='Nozzlegear-content'><p class='Nozzlegear-message'></p><form class='Nozzlegear-form'><div class='Nozzlegear-form-group Nozzlegear-fname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='First Name' /></div><div class='Nozzlegear-form-group Nozzlegear-lname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Last Name' /></div><div class='Nozzlegear-form-group Nozzlegear-fullname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Full Name' /></div><div class='Nozzlegear-form-group Nozzlegear-email-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Email Address' /></div><button class='Nozzlegear-button' type='button'></button></form></div>";
+    private _template: string = "<div class='Nozzlegear-header'><a class='Nozzlegear-toggle' href='#'><h2 class='Nozzlegear-title'></h2><span class='Nozzlegear-arrow'></span></a></div><div class='Nozzlegear-content'><p class='Nozzlegear-message'></p><form autocomplete='off' class='Nozzlegear-form'><div class='Nozzlegear-form-group Nozzlegear-fname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='First Name' /></div><div class='Nozzlegear-form-group Nozzlegear-lname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Last Name' /></div><div class='Nozzlegear-form-group Nozzlegear-fullname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Full Name' /></div><div class='Nozzlegear-form-group Nozzlegear-email-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Email Address' /></div><button class='Nozzlegear-button' type='button'></button></form></div>";
 
     //#endregion 
 
@@ -163,41 +150,89 @@ class Nozzlegear implements INozzlegear {
 
     //#region Utility functions
 
-    private _checkDefaults(position: string, options: INozzlegearOptions): INozzlegearOptions {
+    private _checkDefaults(options: INozzlegearOptions): INozzlegearOptions {
         return {
-            Position: this._positionToEnum(position),
+            Position: options && options.Position || this._defaultOptions.Position,
+            FormOptions: this._checkFormDefaults(options && options.FormOptions),
             Title: options && options.Title || this._defaultOptions.Title,
             Message: options && options.Message || this._defaultOptions.Message,
             ButtonText: options && options.ButtonText || this._defaultOptions.ButtonText,
             BackgroundColor: options && options.BackgroundColor || this._defaultOptions.BackgroundColor,
-            InitialDelay: options && options.InitialDelay || this._defaultOptions.InitialDelay,
-            OpenDelay: options && options.OpenDelay || this._defaultOptions.OpenDelay,
-            CaptureEmailAddress: options && options.CaptureEmailAddress || this._defaultOptions.CaptureEmailAddress,
-            CaptureFirstName: options && options.CaptureFirstName || this._defaultOptions.CaptureFirstName,
-            CaptureLastName: options && options.CaptureLastName || this._defaultOptions.CaptureLastName,
-            CaptureFullName: options && options.CaptureFullName || this._defaultOptions.CaptureFullName,
-            RequireEmailAddress: options && options.RequireEmailAddress || this._defaultOptions.RequireEmailAddress,
-            RequireFirstName: options && options.RequireFirstName || this._defaultOptions.RequireFirstName,
-            RequireLastName: options && options.RequireLastName || this._defaultOptions.RequireLastName,
-            RequireFullName: options && options.RequireFullName || this._defaultOptions.RequireFullName
+            OnConversion: options && options.OnConversion || this._defaultOptions.OnConversion,
+            /* Some js wonkiness means a number of 0 or less will return false. Use a ternary operator instead. */
+            InitialDelay: (options && typeof (options.InitialDelay) === "number") ? options.InitialDelay : this._defaultOptions.InitialDelay,
+            OpenDelay: (options && typeof (options.OpenDelay) === "number") ? options.InitialDelay : this._defaultOptions.OpenDelay,
         };
     }
 
-    private _positionToEnum = function (position: string) {
-        if (!position) { position = "bottomright"; };
-
-        switch (position.toLowerCase()) {
-            default:
-            case "bottomright":
-                return NozzlegearPosition.BottomRight;
-
-            case "bottom":
-                return NozzlegearPosition.Bottom;
-
-            case "bottomleft":
-                return NozzlegearPosition.BottomLeft;
+    private _checkFormDefaults(options: INozzlegearFormOptions): INozzlegearFormOptions {
+        return {
+            ActionUrl: options && options.ActionUrl,
+            Method: options && options.Method,
+            EmailAddressControlName: options && options.EmailAddressControlName,
+            FirstNameControlName: options && options.FirstNameControlName,
+            LastNameControlName: options && options.LastNameControlName,
+            FullNameControlName: options && options.FullNameControlName,
+            CaptureEmailAddress: options && options.CaptureEmailAddress || this._defaultOptions.FormOptions.CaptureEmailAddress,
+            CaptureFirstName: options && options.CaptureFirstName || this._defaultOptions.FormOptions.CaptureFirstName,
+            CaptureLastName: options && options.CaptureLastName || this._defaultOptions.FormOptions.CaptureLastName,
+            CaptureFullName: options && options.CaptureFullName || this._defaultOptions.FormOptions.CaptureFullName,
+            RequireEmailAddress: options && options.RequireEmailAddress || this._defaultOptions.FormOptions.RequireEmailAddress,
+            RequireFirstName: options && options.RequireFirstName || this._defaultOptions.FormOptions.RequireFirstName,
+            RequireLastName: options && options.RequireLastName || this._defaultOptions.FormOptions.RequireLastName,
+            RequireFullName: options && options.RequireFullName || this._defaultOptions.FormOptions.RequireFullName,
         };
-    };
+    }
+
+    private _configureFormOptions(options: INozzlegearFormOptions) {
+        var innerForm = this._form.getElementsByTagName("form").item(0);
+
+        //Config functions
+        var configureControlName = (selector: string, value: string) => {
+            var control = (<HTMLInputElement> this._form.getElementsByClassName(selector).item(0).childNodes.item(0));
+            control.setAttribute("name", value);
+        };
+        var hideControl = (name: string) => {
+            (<HTMLElement> this._form.getElementsByClassName(name).item(0)).classList.add("Nozzlegear-hide");
+        };
+
+        //Set attributes
+        if (options && options.ActionUrl) innerForm.action = options.ActionUrl;
+        if (options && options.Method) innerForm.method = options.Method;
+        if (options && options.EmailAddressControlName) configureControlName("Nozzlegear-email-capture", options.EmailAddressControlName);
+        if (options && options.FirstNameControlName) configureControlName("Nozzlegear-fname-capture", options.FirstNameControlName);
+        if (options && options.LastNameControlName) configureControlName("Nozzlegear-lname-capture", options.LastNameControlName);
+        if (options && options.FullNameControlName) configureControlName("Nozzlegear-fullname-capture", options.FullNameControlName);
+
+        //Show or hide form controls
+        if (!options.CaptureEmailAddress) hideControl("Nozzlegear-email-capture");
+        if (!options.CaptureFirstName) hideControl("Nozzlegear-fname-capture");
+        if (!options.CaptureLastName) hideControl("Nozzlegear-lname-capture");
+        if (!options.CaptureFullName) hideControl("Nozzlegear-fullname-capture");
+    }
+
+    private _toggle(e: MouseEvent) {
+        e.preventDefault();
+
+        this._form.classList.toggle("Nozzlegear-untoggled");
+        this._hasBeenShow = true;
+    }
+
+    private _onButtonClick(e: MouseEvent) {
+        e.preventDefault();
+
+        // TODO: Validate form elements according to options.Require*Capture. 
+
+        //Invoke the developer's OnConversion handler
+        if (this.options.OnConversion) {
+            //Get the form and controls to pass to the developer's handler
+            var innerForm = this._form.getElementsByTagName("form").item(0);
+            var controls = this._form.getElementsByTagName("input");
+
+            //Wait for the handler to return true before submitting the form
+            if (this.options.OnConversion(innerForm, controls)) this._form.getElementsByTagName("form").item(0).submit();
+        };
+    }
 
     //#endregion
 }

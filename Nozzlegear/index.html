@@ -73,7 +73,21 @@
     <div class="hide">
         <script src="Nozzlegear.js"></script>
         <script type="text/javascript">
-            var gear = new Nozzlegear().Start();
+            var options = {
+                Title: "Sending shipments with ASP.NET and C#",
+                FormOptions: {
+                    ActionUrl: "",
+                    Method: "get",
+                    FirstNameControlName: "FNAME",
+                    EmailAddressControlName: "LNAME"
+                },
+                OnConversion: function (form, controls) {
+                    console.log("Conversion!");
+                    return false;
+                },
+                InitialDelay: 0
+            };
+            var gear = new Nozzlegear(options).Start();
         </script>
     </div>
 </body>

@@ -8,15 +8,16 @@ var NozzlegearPosition;
 var Nozzlegear = (function () {
     function Nozzlegear(position, options) {
         this.options = options;
-        this.OnConversion = function () {
-            //To be implemented by user
+        this._onClick = function (e) {
+            e.preventDefault();
+            // TODO: Invoke the user's OnConversion handler
         };
         //#region Utility variables
         this._isStarted = false;
         this._defaultOptions = {
             Position: 2 /* BottomRight */,
             Title: "Sign up for our mailing list!",
-            Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+            Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
             ButtonText: "Sign up!",
             BackgroundColor: "#34495e",
             OpenDelay: 5000,
@@ -49,12 +50,21 @@ var Nozzlegear = (function () {
             ;
         };
         this.options = this._checkDefaults(position, options);
+        //Prepare a unique id to get a reference to the form after appending it to the body
+        var uid = "Nozzlegear-" + Math.random();
         //Build template and append to body
         this._form = document.createElement("div");
+        this._form.id = uid;
         this._form.classList.add("Nozzlegear-container");
         this._form.classList.add("Nozzlegear-hide");
+        this._form.classList.add("Nozzlegear-untoggled");
         this._form.style.backgroundColor = this.options.BackgroundColor;
         this._form.innerHTML = this._template;
+        //Determine position
+        if (this.options.Position === 0 /* BottomLeft */)
+            this._form.classList.add("Nozzlegear-bottom-left");
+        if (this.options.Position === 2 /* BottomRight */)
+            this._form.classList.add("Nozzlegear-bottom-right");
         //Set the content
         this._form.getElementsByClassName("Nozzlegear-title").item(0).textContent = this.options.Title;
         this._form.getElementsByClassName("Nozzlegear-message").item(0).textContent = this.options.Message;
@@ -72,16 +82,27 @@ var Nozzlegear = (function () {
             hideControl("Nozzlegear-lname-capture");
         if (!this.options.CaptureFullName)
             hideControl("Nozzlegear-fullname-capture");
-        //Wire up event listeners
+        //Wire up click listeners
+        this._form.getElementsByClassName("Nozzlegear-button").item(0).addEventListener("click", this._onClick);
+        this._form.getElementsByClassName("Nozzlegear-toggle").item(0).addEventListener("click", this.Show);
         //Append the form to the document
         document.body.appendChild(this._form);
+        //Form reference is lost after appending. Get it back
+        this._form = document.getElementById(uid);
     }
-    Nozzlegear.prototype.Show = function () {
-        console.log("Showing");
+    Nozzlegear.prototype.Show = function (e) {
+        if (e)
+            e.preventDefault();
+        this.Hide();
+        //Show form by removing the untoggled class
+        this._form.classList.remove("Nozzlegear-untoggled");
         return this;
     };
-    Nozzlegear.prototype.Hide = function () {
-        console.log("Hiding");
+    Nozzlegear.prototype.Hide = function (e) {
+        if (e)
+            e.preventDefault();
+        //Hide form by adding the untoggled class
+        this._form.classList.add("Nozzlegear-untoggled");
         return this;
     };
     Nozzlegear.prototype.Start = function () {

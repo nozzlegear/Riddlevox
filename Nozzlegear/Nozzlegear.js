@@ -5,6 +5,7 @@ var Nozzlegear = (function () {
         //#region Utility variables
         this._isStarted = false;
         this._hasBeenShow = false;
+        this._isOpen = false;
         this._defaultOptions = {
             Position: "bottom-right",
             FormOptions: {
@@ -12,10 +13,6 @@ var Nozzlegear = (function () {
                 CaptureFirstName: true,
                 CaptureFullName: false,
                 CaptureLastName: false,
-                RequireEmailAddress: true,
-                RequireFirstName: false,
-                RequireLastName: false,
-                RequireFullName: false,
             },
             Title: "Sign up for our mailing list!",
             Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
@@ -28,13 +25,14 @@ var Nozzlegear = (function () {
             }
         };
         //#region Template
-        this._template = "<div class='Nozzlegear-header'><a class='Nozzlegear-toggle' href='#'><h2 class='Nozzlegear-title'></h2><span class='Nozzlegear-arrow'></span></a></div><div class='Nozzlegear-content'><p class='Nozzlegear-message'></p><form autocomplete='off' class='Nozzlegear-form'><div class='Nozzlegear-form-group Nozzlegear-fname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='First Name' /></div><div class='Nozzlegear-form-group Nozzlegear-lname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Last Name' /></div><div class='Nozzlegear-form-group Nozzlegear-fullname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Full Name' /></div><div class='Nozzlegear-form-group Nozzlegear-email-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Email Address' /></div><button class='Nozzlegear-button' type='button'></button></form></div>";
+        this._template = "<div class='Nozzlegear-header'><a class='Nozzlegear-toggle' href='#'><h2 class='Nozzlegear-title'></h2><span class='Nozzlegear-arrow'></span></a></div><div class='Nozzlegear-content'><p class='Nozzlegear-message'></p><form autocomplete='off' class='Nozzlegear-form'><div class='Nozzlegear-form-group Nozzlegear-fname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='First Name' /></div><div class='Nozzlegear-form-group Nozzlegear-lname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Last Name' /></div><div class='Nozzlegear-form-group Nozzlegear-fullname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Full Name' /></div><div class='Nozzlegear-form-group Nozzlegear-email-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Email Address' /></div><p class='Nozzlegear-error Nozzlegear-hide'></p><button class='Nozzlegear-button' type='button'></button></form></div>";
         this.options = this._checkDefaults(options);
         //Build template and append to body
         this._form = document.createElement("div");
         this._form.classList.add("Nozzlegear-container");
         this._form.classList.add("Nozzlegear-hide");
         this._form.classList.add("Nozzlegear-untoggled");
+        this._form.style.maxHeight = "0px";
         this._form.style.backgroundColor = this.options.BackgroundColor;
         this._form.innerHTML = this._template;
         //Determine position
@@ -57,16 +55,22 @@ var Nozzlegear = (function () {
         }, true);
         //Append the form to the document
         document.body.appendChild(this._form);
+        //Get the error element
+        this._errorElement = this._form.querySelector("p.Nozzlegear-error");
     }
     Nozzlegear.prototype.Open = function () {
         //Show form by removing the untoggled class
         this._form.classList.remove("Nozzlegear-untoggled");
+        this._form.style.maxHeight = "600px";
+        this._isOpen = true;
         this._hasBeenShow = true;
         return this;
     };
     Nozzlegear.prototype.Close = function () {
         //Hide form by adding the untoggled class
+        this._form.style.maxHeight = this._form.querySelector(".Nozzlegear-header").offsetHeight + "px";
         this._form.classList.add("Nozzlegear-untoggled");
+        this._isOpen = false;
         return this;
     };
     Nozzlegear.prototype.Start = function () {
@@ -75,6 +79,7 @@ var Nozzlegear = (function () {
             this._isStarted = true;
             var peakForm = function () {
                 _this._form.classList.remove("Nozzlegear-hide");
+                _this._form.style.maxHeight = _this._form.querySelector(".Nozzlegear-header").offsetHeight + "px";
                 if (_this.options.OpenDelay < 0) {
                 }
                 else if (_this.options.OpenDelay === 0) {
@@ -100,6 +105,16 @@ var Nozzlegear = (function () {
             ;
         }
         ;
+        return this;
+    };
+    Nozzlegear.prototype.ShowError = function (message) {
+        this._errorElement.textContent = message;
+        this._errorElement.classList.remove("Nozzlegear-hide");
+        return this;
+    };
+    Nozzlegear.prototype.HideError = function () {
+        this._errorElement.textContent = "";
+        this._errorElement.classList.add("Nozzlegear-hide");
         return this;
     };
     //#endregion 
@@ -131,10 +146,6 @@ var Nozzlegear = (function () {
             CaptureFirstName: options && options.CaptureFirstName || this._defaultOptions.FormOptions.CaptureFirstName,
             CaptureLastName: options && options.CaptureLastName || this._defaultOptions.FormOptions.CaptureLastName,
             CaptureFullName: options && options.CaptureFullName || this._defaultOptions.FormOptions.CaptureFullName,
-            RequireEmailAddress: options && options.RequireEmailAddress || this._defaultOptions.FormOptions.RequireEmailAddress,
-            RequireFirstName: options && options.RequireFirstName || this._defaultOptions.FormOptions.RequireFirstName,
-            RequireLastName: options && options.RequireLastName || this._defaultOptions.FormOptions.RequireLastName,
-            RequireFullName: options && options.RequireFullName || this._defaultOptions.FormOptions.RequireFullName,
         };
     };
     Nozzlegear.prototype._configureFormOptions = function (options) {
@@ -173,17 +184,28 @@ var Nozzlegear = (function () {
     };
     Nozzlegear.prototype._toggle = function (e) {
         e.preventDefault();
-        this._form.classList.toggle("Nozzlegear-untoggled");
-        this._hasBeenShow = true;
+        if (!this._isOpen) {
+            this.Open();
+        }
+        else {
+            this.Close();
+        }
+        ;
     };
     Nozzlegear.prototype._onButtonClick = function (e) {
         e.preventDefault();
-        // TODO: Validate form elements according to options.Require*Capture. 
+        //Always hide the error
+        this.HideError();
         //Invoke the developer's OnConversion handler
         if (this.options.OnConversion) {
             //Get the form and controls to pass to the developer's handler
             var innerForm = this._form.getElementsByTagName("form").item(0);
-            var controls = this._form.getElementsByTagName("input");
+            var controls = {
+                EmailAddress: this._form.querySelector("div.Nozzlegear-email-capture > input").value,
+                FirstName: this._form.querySelector("div.Nozzlegear-fname-capture > input").value,
+                LastName: this._form.querySelector("div.Nozzlegear-lname-capture > input").value,
+                FullName: this._form.querySelector("div.Nozzlegear-fullname-capture > input").value,
+            };
             //Wait for the handler to return true before submitting the form
             if (this.options.OnConversion(innerForm, controls))
                 this._form.getElementsByTagName("form").item(0).submit();

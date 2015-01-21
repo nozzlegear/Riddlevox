@@ -22,47 +22,43 @@ span {
     max-width: 350px;
     width: 350px;
     opacity: .95;
-    -moz-transition: bottom 2000ms ease-in;
-    -o-transition: bottom 2000ms ease-in;
-    -webkit-transition: bottom 2000ms ease-in;
-    transition: bottom 2000ms ease-in;
     box-shadow: 0 0 20px rgba(0,0,0,0.25);
+    -moz-transition: bottom 200ms ease-in-out;
+    -o-transition: bottom 200ms ease-in-out;
+    -webkit-transition: bottom 200ms ease-in-out;
+    transition: bottom 200ms ease-in-out;
+    -moz-transition-property: max-height;
+    -o-transition-property: max-height;
+    -webkit-transition-property: max-height;
+    transition-property: max-height;
 }
 
     .Nozzlegear-container.Nozzlegear-bottom-right {
         right: 5%;
-        -moz-transition: right 2000ms ease-in;
-        -o-transition: right 2000ms ease-in;
-        -webkit-transition: right 2000ms ease-in;
-        transition: right 2000ms ease-in;
     }
 
     .Nozzlegear-container.Nozzlegear-bottom-left {
         left: 5%;
-        -moz-transition: left 2000ms ease-in;
-        -o-transition: left 2000ms ease-in;
-        -webkit-transition: left 2000ms ease-in;
-        transition: left 2000ms ease-in;
-    }
-
-    .Nozzlegear-container.Nozzlegear-untoggled {
-        padding: 0 5px;
     }
 
 .Nozzlegear-content {
     background: #fff;
     border-radius: 6px;
     padding: 15px;
+    -moz-transition: bottom 200ms ease-in-out;
+    -o-transition: bottom 200ms ease-in-out;
+    -webkit-transition: bottom 200ms ease-in-out;
+    transition: bottom 200ms ease-in-out;
+    -moz-transition-property: min-height, max-height, padding;
+    -o-transition-property: min-height, max-height, padding;
+    -webkit-transition-property: min-height, max-height, padding;
+    transition-property: min-height, max-height, padding;
 }
 
     .Nozzlegear-content > p.Nozzlegear-message {
         margin: 0 0 15px 0 !important;
         font-size: 14px !important;
     }
-
-.Nozzlegear-container.Nozzlegear-untoggled > .Nozzlegear-content {
-    display: none;
-}
 
 .Nozzlegear-form {
 }
@@ -121,6 +117,12 @@ span {
         cursor: pointer !important;
         background-image: none !important;
         border-radius: 4px !important;
+    }
+
+    .Nozzlegear-form > p.Nozzlegear-error {
+        color: #ff0000;
+        margin: 10px 0 0 0;
+        font-size: 14px !important;
     }
 
 .Nozzlegear-hide {

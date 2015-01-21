@@ -16,6 +16,7 @@
         <script type="text/javascript">
             var options = {
                 Title: "Sending shipments with ASP.NET and C#",
+                ButtonText: "Wololo!",
                 FormOptions: {
                     ActionUrl: "",
                     Method: "get",
@@ -23,8 +24,14 @@
                     EmailAddressControlName: "LNAME"
                 },
                 OnConversion: function (form, controls) {
-                    console.log("Conversion!");
-                    return false;
+                    if (!controls.FirstName) {
+                        gear.ShowError("Please enter your first name.");
+                    } else if (!controls.EmailAddress || controls.EmailAddress.indexOf("@") === -1 || controls.EmailAddress.indexOf(".") === -1) {
+                        gear.ShowError("Please enter a valid email address.");
+                    }
+                    else {
+                        return true;
+                    }
                 },
                 InitialDelay: 0
             };

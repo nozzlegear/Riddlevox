@@ -10,8 +10,16 @@ Nozzlegear is an open-source Javascript library that will help you capture more 
 **NB:** This section will be updated with better documentation upon the 1.0 release.
 
 ```
+//By default, Nozzlegear will not automatically show a popup if the user has converted (subscribed to your list, etc.). Pass in a UniqueId to differentiate between different popups. 
+var uniqueId = "mainPageMailingList";
+
+//Set ShowPopupIfConverted to true to always show the popup, even if the user has already triggered the OnConversion event.
+var showIfConverted = false;
+
 var options = {
     Position: "bottom-right",
+    UniqueId: uniqueId,
+    ShowPopupIfConverted: showIfConverted,
     Title: "Hello, world!",
     Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     ButtonText: "Sign up!",
@@ -48,14 +56,13 @@ var options = {
 	        return true;
         };
     },
-    InitialDelay: 0, //Controls when the popup itself will be added to the page.
-    OpenDelay: 5000, //Controls when the popup will open. Set to 0 for immediately, -1 for never.
+    AutoOpenDelay: 5000, //Controls when the popup will automatically open. Set to 0 for immediately, -1 for never.
 };
 
 //Initialize and start Nozzlegear
 var gear = new Nozzlegear(options).Start();
 
-//Manually open and close the popup if you set your OpenDelay to -1
+//Manually open and close the popup if your settings do not allow it to auto open.
 gear.Open();
 gear.Hide();
 ```

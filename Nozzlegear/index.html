@@ -20,8 +20,10 @@
                 FormOptions: {
                     ActionUrl: "",
                     Method: "get",
-                    FirstNameControlName: "FNAME",
-                    EmailAddressControlName: "LNAME"
+                    FullNameControlName: "FULLNAME",
+                    EmailAddressControlName: "LNAME",
+                    CaptureFullName: true,
+                    CaptureFirstName: false
                 },
                 OnConversion: function (form, controls) {
                     if (!controls.FirstName) {

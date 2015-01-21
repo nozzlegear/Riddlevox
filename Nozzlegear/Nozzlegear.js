@@ -8,18 +8,24 @@ var Nozzlegear = (function () {
         this._isOpen = false;
         this._defaultOptions = {
             Position: "bottom-right",
+            UniqueId: "defaultUniqueId4256",
+            ShowPopupIfConverted: false,
             FormOptions: {
                 CaptureEmailAddress: true,
                 CaptureFirstName: true,
                 CaptureFullName: false,
                 CaptureLastName: false,
             },
+            //CookieOptions{
+            //    CookieName: "Nozzlegear-default-cookie",
+            //    ShowEveryXDays: 0,
+            //    OpenEveryXDays: 0,
+            //},
             Title: "Sign up for our mailing list!",
             Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
             ButtonText: "Sign up!",
             BackgroundColor: "#34495e",
-            OpenDelay: 5000,
-            InitialDelay: 1000,
+            AutoOpenDelay: 5000,
             OnConversion: function (form, controls) {
                 return true;
             }
@@ -31,7 +37,6 @@ var Nozzlegear = (function () {
         this._form = document.createElement("div");
         this._form.classList.add("Nozzlegear-container");
         this._form.classList.add("Nozzlegear-hide");
-        this._form.classList.add("Nozzlegear-untoggled");
         this._form.style.maxHeight = "0px";
         this._form.style.backgroundColor = this.options.BackgroundColor;
         this._form.innerHTML = this._template;
@@ -59,17 +64,15 @@ var Nozzlegear = (function () {
         this._errorElement = this._form.querySelector("p.Nozzlegear-error");
     }
     Nozzlegear.prototype.Open = function () {
-        //Show form by removing the untoggled class
-        this._form.classList.remove("Nozzlegear-untoggled");
+        //Ensure the form itself is shown
+        this._form.classList.remove("Nozzlegear-hide");
         this._form.style.maxHeight = "600px";
         this._isOpen = true;
         this._hasBeenShow = true;
         return this;
     };
     Nozzlegear.prototype.Close = function () {
-        //Hide form by adding the untoggled class
         this._form.style.maxHeight = this._form.querySelector(".Nozzlegear-header").offsetHeight + "px";
-        this._form.classList.add("Nozzlegear-untoggled");
         this._isOpen = false;
         return this;
     };
@@ -77,30 +80,31 @@ var Nozzlegear = (function () {
         var _this = this;
         if (!this._isStarted) {
             this._isStarted = true;
-            var peakForm = function () {
-                _this._form.classList.remove("Nozzlegear-hide");
-                _this._form.style.maxHeight = _this._form.querySelector(".Nozzlegear-header").offsetHeight + "px";
-                if (_this.options.OpenDelay < 0) {
-                }
-                else if (_this.options.OpenDelay === 0) {
-                    _this.Open();
-                }
-                else {
-                    //Must use lambda syntax here to preserve 'this' both in the function and in .Show
-                    setTimeout(function () {
-                        if (!_this._hasBeenShow) {
-                            _this.Open();
-                        }
-                        ;
-                    }, _this.options.OpenDelay);
+            // TODO: Only auto show if ShowPopupIfConverted is true or user has not converted
+            if (this.options.ShowPopupIfConverted || true) {
+                //Show popup's title tab
+                this._form.classList.remove("Nozzlegear-hide");
+                this._form.style.maxHeight = this._form.querySelector(".Nozzlegear-header").offsetHeight + "px";
+                //TODO: Only auto open if AutoOpenIfPreviouslySeen is true
+                if (true) {
+                    //Check if we should automatically open the popup
+                    if (this.options.AutoOpenDelay < 0) {
+                    }
+                    else if (this.options.AutoOpenDelay === 0) {
+                        this.Open();
+                    }
+                    else {
+                        //Must use lambda syntax here to preserve 'this' both in the function and in .Show
+                        setTimeout(function () {
+                            if (!_this._hasBeenShow) {
+                                _this.Open();
+                            }
+                            ;
+                        }, this.options.AutoOpenDelay);
+                    }
+                    ;
                 }
                 ;
-            };
-            if (this.options.InitialDelay === 0) {
-                peakForm();
-            }
-            else {
-                setTimeout(peakForm, this.options.InitialDelay);
             }
             ;
         }
@@ -120,32 +124,41 @@ var Nozzlegear = (function () {
     //#endregion 
     //#endregion
     //#region Utility functions
+    Nozzlegear.prototype._propertyExists = function (property, isTypeOf) {
+        if (property === null || typeof (property) !== isTypeOf) {
+            return false;
+        }
+        else {
+            return true;
+        }
+        ;
+    };
     Nozzlegear.prototype._checkDefaults = function (options) {
         return {
-            Position: options && options.Position || this._defaultOptions.Position,
+            Position: this._propertyExists(options && options.Position, "string") ? options.Position : this._defaultOptions.Position,
+            UniqueId: this._propertyExists(options && options.UniqueId, "string") ? options.UniqueId : this._defaultOptions.UniqueId,
+            ShowPopupIfConverted: this._propertyExists(options && options.ShowPopupIfConverted, "boolean") ? options.ShowPopupIfConverted : this._defaultOptions.ShowPopupIfConverted,
             FormOptions: this._checkFormDefaults(options && options.FormOptions),
-            Title: options && options.Title || this._defaultOptions.Title,
-            Message: options && options.Message || this._defaultOptions.Message,
-            ButtonText: options && options.ButtonText || this._defaultOptions.ButtonText,
-            BackgroundColor: options && options.BackgroundColor || this._defaultOptions.BackgroundColor,
-            OnConversion: options && options.OnConversion || this._defaultOptions.OnConversion,
-            /* Some js wonkiness means a number of 0 or less will return false. Use a ternary operator instead. */
-            InitialDelay: (options && typeof (options.InitialDelay) === "number") ? options.InitialDelay : this._defaultOptions.InitialDelay,
-            OpenDelay: (options && typeof (options.OpenDelay) === "number") ? options.InitialDelay : this._defaultOptions.OpenDelay,
+            Title: this._propertyExists(options && options.Title, "string") ? options.Title : this._defaultOptions.Title,
+            Message: this._propertyExists(options && options.Message, "string") ? options.Message : this._defaultOptions.Message,
+            ButtonText: this._propertyExists(options && options.ButtonText, "string") ? options.ButtonText : this._defaultOptions.ButtonText,
+            BackgroundColor: this._propertyExists(options && options.BackgroundColor, "string") ? options.BackgroundColor : this._defaultOptions.BackgroundColor,
+            OnConversion: this._propertyExists(options && options.OnConversion, "function") ? options.OnConversion : this._defaultOptions.OnConversion,
+            AutoOpenDelay: this._propertyExists(options && options.AutoOpenDelay, "number") ? options.AutoOpenDelay : this._defaultOptions.AutoOpenDelay,
         };
     };
     Nozzlegear.prototype._checkFormDefaults = function (options) {
         return {
-            ActionUrl: options && options.ActionUrl,
-            Method: options && options.Method,
-            EmailAddressControlName: options && options.EmailAddressControlName,
-            FirstNameControlName: options && options.FirstNameControlName,
-            LastNameControlName: options && options.LastNameControlName,
-            FullNameControlName: options && options.FullNameControlName,
-            CaptureEmailAddress: options && options.CaptureEmailAddress || this._defaultOptions.FormOptions.CaptureEmailAddress,
-            CaptureFirstName: options && options.CaptureFirstName || this._defaultOptions.FormOptions.CaptureFirstName,
-            CaptureLastName: options && options.CaptureLastName || this._defaultOptions.FormOptions.CaptureLastName,
-            CaptureFullName: options && options.CaptureFullName || this._defaultOptions.FormOptions.CaptureFullName,
+            ActionUrl: this._propertyExists(options && options.ActionUrl, "string") ? options.ActionUrl : null,
+            Method: this._propertyExists(options && options.Method, "string") ? options.Method : null,
+            EmailAddressControlName: this._propertyExists(options && options.EmailAddressControlName, "string") ? options.EmailAddressControlName : null,
+            FirstNameControlName: this._propertyExists(options && options.FirstNameControlName, "string") ? options.FirstNameControlName : null,
+            LastNameControlName: this._propertyExists(options && options.LastNameControlName, "string") ? options.LastNameControlName : null,
+            FullNameControlName: this._propertyExists(options && options.FullNameControlName, "string") ? options.FullNameControlName : null,
+            CaptureEmailAddress: this._propertyExists(options && options.CaptureEmailAddress, "boolean") ? options.CaptureEmailAddress : this._defaultOptions.FormOptions.CaptureEmailAddress,
+            CaptureFirstName: this._propertyExists(options && options.CaptureFirstName, "boolean") ? options.CaptureFirstName : this._defaultOptions.FormOptions.CaptureFirstName,
+            CaptureLastName: this._propertyExists(options && options.CaptureLastName, "boolean") ? options.CaptureLastName : this._defaultOptions.FormOptions.CaptureLastName,
+            CaptureFullName: this._propertyExists(options && options.CaptureFullName, "boolean") ? options.CaptureFullName : this._defaultOptions.FormOptions.CaptureFullName,
         };
     };
     Nozzlegear.prototype._configureFormOptions = function (options) {
@@ -181,6 +194,32 @@ var Nozzlegear = (function () {
             hideControl("Nozzlegear-lname-capture");
         if (!options.CaptureFullName)
             hideControl("Nozzlegear-fullname-capture");
+    };
+    Nozzlegear.prototype._getCookie = function (name) {
+        if (document.cookie.length > 0) {
+            var prefix = document.cookie.indexOf(name + "=");
+            if (prefix !== -1) {
+                prefix = prefix + name.length + 1;
+                var suffix = document.cookie.indexOf(";", prefix);
+                if (suffix === -1)
+                    suffix = document.cookie.length;
+                return decodeURIComponent(document.cookie.substring(prefix, suffix));
+            }
+            ;
+        }
+        ;
+        return "";
+    };
+    Nozzlegear.prototype._setCookie = function (name, value, expirationInDays) {
+        if (value) {
+            var exdate = new Date();
+            exdate.setDate(exdate.getDate() + expirationInDays);
+            document.cookie = name + "=" + encodeURIComponent(value) + ((expirationInDays === null) ? "" : ";expires=" + exdate.toUTCString());
+        }
+        else {
+            document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+        }
+        ;
     };
     Nozzlegear.prototype._toggle = function (e) {
         e.preventDefault();

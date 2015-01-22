@@ -20,16 +20,15 @@ interface INozzlegearFormOptions {
 }
 
 interface INozzlegearCookieData {
-    HasSubscribed: boolean;
-    HasClosed: boolean;
-    HasOpened: boolean;
+    HasConverted: boolean;
+    HasInteracted: boolean;
 }
 
 interface INozzlegearOptions {
     Position: string;
     UniqueId: string;
     ShowPopupIfConverted: boolean;
-    //AutoOpenIfPreviouslySeen: boolean;
+    AutoOpenIfPreviouslyInteracted: boolean;
     FormOptions: INozzlegearFormOptions;
     Title: string;
     Message: string;
@@ -54,6 +53,7 @@ class Nozzlegear implements INozzlegear {
         this._form = document.createElement("div");
         this._form.classList.add("Nozzlegear-container");
         this._form.classList.add("Nozzlegear-hide");
+        this._form.classList.add("Nozzlegear-untoggled");
         this._form.style.maxHeight = "0px";
         this._form.style.backgroundColor = this.options.BackgroundColor;
         this._form.innerHTML = this._template;
@@ -79,11 +79,29 @@ class Nozzlegear implements INozzlegear {
 
         //Get the error element
         this._errorElement = <HTMLParagraphElement> this._form.querySelector("p.Nozzlegear-error");
+
+        //Acquire cookie data
+        this._cookieValue = (() => {
+            var output: INozzlegearCookieData;
+            
+            try {
+                output = JSON.parse(this._getCookie("Nozzlegear-" + this.options.UniqueId + "-form"));
+            }
+            catch (e) {
+                output = {
+                    HasConverted: false,
+                    HasInteracted: false,
+                };
+            };
+
+            return output;
+        })();
     }
 
     public Open(): INozzlegear {
         //Ensure the form itself is shown
         this._form.classList.remove("Nozzlegear-hide");
+        this._form.classList.remove("Nozzlegear-untoggled");
         this._form.style.maxHeight = "600px";
         this._isOpen = true;
         this._hasBeenShow = true;
@@ -93,6 +111,7 @@ class Nozzlegear implements INozzlegear {
 
     public Close(): INozzlegear {
         this._form.style.maxHeight = (<HTMLElement> this._form.querySelector(".Nozzlegear-header")).offsetHeight + "px";
+        this._form.classList.add("Nozzlegear-untoggled");
         this._isOpen = false;
 
         return this;
@@ -102,14 +121,16 @@ class Nozzlegear implements INozzlegear {
         if (!this._isStarted) {
             this._isStarted = true;
 
-            // TODO: Only auto show if ShowPopupIfConverted is true or user has not converted
-            if (this.options.ShowPopupIfConverted || true) {
+            //Only auto show if ShowPopupIfConverted is true or user has not converted
+            if (this.options.ShowPopupIfConverted || !this._cookieValue.HasConverted) {
                 //Show popup's title tab
                 this._form.classList.remove("Nozzlegear-hide");
                 this._form.style.maxHeight = (<HTMLElement> this._form.querySelector(".Nozzlegear-header")).offsetHeight + "px";
 
-                //TODO: Only auto open if AutoOpenIfPreviouslySeen is true
-                if (true) {
+                //Only auto open if AutoOpenIfPreviouslySeen is true, user has not open/closed popup or device width indicates mobile
+                if ((this.options.AutoOpenIfPreviouslyInteracted || !this._cookieValue.HasInteracted) && this._deviceWidth > 830) {
+                    console.log("Auto open?", this.options.AutoOpenIfPreviouslyInteracted);
+                    console.log("Has interacted?", this._cookieValue.HasInteracted);
                     //Check if we should automatically open the popup
                     if (this.options.AutoOpenDelay < 0) {
                         //Never open if value is less than 0, instead wait for .Show
@@ -148,22 +169,20 @@ class Nozzlegear implements INozzlegear {
     private _hasBeenShow: boolean = false;
     private _isOpen: boolean = false;
     private _errorElement: HTMLParagraphElement;
+    private _deviceWidth: number = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+    private _cookieValue: INozzlegearCookieData;
 
     private _defaultOptions: INozzlegearOptions = {
         Position: "bottom-right",
         UniqueId: "defaultUniqueId4256",
         ShowPopupIfConverted: false,
+        AutoOpenIfPreviouslyInteracted: false,
         FormOptions: {
             CaptureEmailAddress: true,
             CaptureFirstName: true,
             CaptureFullName: false,
             CaptureLastName: false,
         },
-        //CookieOptions{
-        //    CookieName: "Nozzlegear-default-cookie",
-        //    ShowEveryXDays: 0,
-        //    OpenEveryXDays: 0,
-        //},
         Title: "Sign up for our mailing list!",
         Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         ButtonText: "Sign up!",
@@ -187,7 +206,7 @@ class Nozzlegear implements INozzlegear {
     //#region Utility functions
 
     private _propertyExists(property: any, isTypeOf: string): boolean {
-        if (property === null || typeof(property) !== isTypeOf ) {
+        if (property === null || typeof (property) !== isTypeOf) {
             return false;
         } else {
             return true;
@@ -199,10 +218,11 @@ class Nozzlegear implements INozzlegear {
             Position: this._propertyExists(options && options.Position, "string") ? options.Position : this._defaultOptions.Position,
             UniqueId: this._propertyExists(options && options.UniqueId, "string") ? options.UniqueId : this._defaultOptions.UniqueId,
             ShowPopupIfConverted: this._propertyExists(options && options.ShowPopupIfConverted, "boolean") ? options.ShowPopupIfConverted : this._defaultOptions.ShowPopupIfConverted,
+            AutoOpenIfPreviouslyInteracted: this._propertyExists(options && options.AutoOpenIfPreviouslyInteracted, "boolean") ? options.AutoOpenIfPreviouslyInteracted : this._defaultOptions.AutoOpenIfPreviouslyInteracted,
             FormOptions: this._checkFormDefaults(options && options.FormOptions),
-            Title: this._propertyExists( options && options.Title, "string") ? options.Title : this._defaultOptions.Title,
-            Message: this._propertyExists( options && options.Message, "string") ? options.Message : this._defaultOptions.Message,
-            ButtonText: this._propertyExists( options && options.ButtonText, "string") ? options.ButtonText : this._defaultOptions.ButtonText,
+            Title: this._propertyExists(options && options.Title, "string") ? options.Title : this._defaultOptions.Title,
+            Message: this._propertyExists(options && options.Message, "string") ? options.Message : this._defaultOptions.Message,
+            ButtonText: this._propertyExists(options && options.ButtonText, "string") ? options.ButtonText : this._defaultOptions.ButtonText,
             BackgroundColor: this._propertyExists(options && options.BackgroundColor, "string") ? options.BackgroundColor : this._defaultOptions.BackgroundColor,
             OnConversion: this._propertyExists(options && options.OnConversion, "function") ? options.OnConversion : this._defaultOptions.OnConversion,
             AutoOpenDelay: this._propertyExists(options && options.AutoOpenDelay, "number") ? options.AutoOpenDelay : this._defaultOptions.AutoOpenDelay,
@@ -211,16 +231,16 @@ class Nozzlegear implements INozzlegear {
 
     private _checkFormDefaults(options: INozzlegearFormOptions): INozzlegearFormOptions {
         return {
-            ActionUrl: this._propertyExists( options && options.ActionUrl, "string") ? options.ActionUrl : null,
-            Method: this._propertyExists( options && options.Method, "string") ? options.Method : null,
-            EmailAddressControlName: this._propertyExists( options && options.EmailAddressControlName, "string") ? options.EmailAddressControlName : null,
-            FirstNameControlName: this._propertyExists( options && options.FirstNameControlName, "string") ? options.FirstNameControlName : null,
-            LastNameControlName: this._propertyExists( options && options.LastNameControlName, "string") ? options.LastNameControlName : null,
-            FullNameControlName: this._propertyExists( options && options.FullNameControlName, "string") ? options.FullNameControlName : null,
-            CaptureEmailAddress: this._propertyExists( options && options.CaptureEmailAddress, "boolean") ? options.CaptureEmailAddress : this._defaultOptions.FormOptions.CaptureEmailAddress, 
-            CaptureFirstName: this._propertyExists( options && options.CaptureFirstName, "boolean") ? options.CaptureFirstName : this._defaultOptions.FormOptions.CaptureFirstName, 
-            CaptureLastName: this._propertyExists( options && options.CaptureLastName, "boolean") ? options.CaptureLastName : this._defaultOptions.FormOptions.CaptureLastName,
-            CaptureFullName: this._propertyExists( options && options.CaptureFullName, "boolean") ? options.CaptureFullName : this._defaultOptions.FormOptions.CaptureFullName, 
+            ActionUrl: this._propertyExists(options && options.ActionUrl, "string") ? options.ActionUrl : null,
+            Method: this._propertyExists(options && options.Method, "string") ? options.Method : null,
+            EmailAddressControlName: this._propertyExists(options && options.EmailAddressControlName, "string") ? options.EmailAddressControlName : null,
+            FirstNameControlName: this._propertyExists(options && options.FirstNameControlName, "string") ? options.FirstNameControlName : null,
+            LastNameControlName: this._propertyExists(options && options.LastNameControlName, "string") ? options.LastNameControlName : null,
+            FullNameControlName: this._propertyExists(options && options.FullNameControlName, "string") ? options.FullNameControlName : null,
+            CaptureEmailAddress: this._propertyExists(options && options.CaptureEmailAddress, "boolean") ? options.CaptureEmailAddress : this._defaultOptions.FormOptions.CaptureEmailAddress,
+            CaptureFirstName: this._propertyExists(options && options.CaptureFirstName, "boolean") ? options.CaptureFirstName : this._defaultOptions.FormOptions.CaptureFirstName,
+            CaptureLastName: this._propertyExists(options && options.CaptureLastName, "boolean") ? options.CaptureLastName : this._defaultOptions.FormOptions.CaptureLastName,
+            CaptureFullName: this._propertyExists(options && options.CaptureFullName, "boolean") ? options.CaptureFullName : this._defaultOptions.FormOptions.CaptureFullName,
         };
     }
 
@@ -277,6 +297,10 @@ class Nozzlegear implements INozzlegear {
         };
     }
 
+    private _saveCookieData() {
+        this._setCookie("Nozzlegear-" + this.options.UniqueId + "-form", JSON.stringify(this._cookieValue), 365 * 10);
+    }
+
     private _toggle(e: MouseEvent) {
         e.preventDefault();
 
@@ -284,6 +308,9 @@ class Nozzlegear implements INozzlegear {
             this.Open();
         }
         else {
+            this._cookieValue.HasInteracted = true;
+            this._saveCookieData();
+
             this.Close();
         };
     }
@@ -306,7 +333,12 @@ class Nozzlegear implements INozzlegear {
             };
 
             //Wait for the handler to return true before submitting the form
-            if (this.options.OnConversion(innerForm, controls)) this._form.getElementsByTagName("form").item(0).submit();
+            if (this.options.OnConversion(innerForm, controls)) {
+                this._cookieValue.HasConverted = true;
+                this._saveCookieData();
+
+                this._form.getElementsByTagName("form").item(0).submit();
+            };
         };
     }
 

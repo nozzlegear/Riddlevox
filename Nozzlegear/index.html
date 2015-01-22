@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <title>Nozzlegear Test Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="Nozzlegear.css" rel="stylesheet" />
 </head>
 <body>
@@ -17,6 +18,8 @@
             var options = {
                 Title: "Sending shipments with ASP.NET and C#",
                 ButtonText: "Wololo!",
+                ShowPopupIfConverted: true,
+                AutoOpenIfPreviouslyInteracted: true,
                 FormOptions: {
                     ActionUrl: "",
                     Method: "get",
@@ -26,7 +29,7 @@
                     CaptureFirstName: false
                 },
                 OnConversion: function (form, controls) {
-                    if (!controls.FirstName) {
+                    if (!controls.FullName) {
                         gear.ShowError("Please enter your first name.");
                     } else if (!controls.EmailAddress || controls.EmailAddress.indexOf("@") === -1 || controls.EmailAddress.indexOf(".") === -1) {
                         gear.ShowError("Please enter a valid email address.");

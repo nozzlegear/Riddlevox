@@ -6,21 +6,18 @@ var Nozzlegear = (function () {
         this._isStarted = false;
         this._hasBeenShow = false;
         this._isOpen = false;
+        this._deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
         this._defaultOptions = {
             Position: "bottom-right",
             UniqueId: "defaultUniqueId4256",
             ShowPopupIfConverted: false,
+            AutoOpenIfPreviouslyInteracted: false,
             FormOptions: {
                 CaptureEmailAddress: true,
                 CaptureFirstName: true,
                 CaptureFullName: false,
                 CaptureLastName: false,
             },
-            //CookieOptions{
-            //    CookieName: "Nozzlegear-default-cookie",
-            //    ShowEveryXDays: 0,
-            //    OpenEveryXDays: 0,
-            //},
             Title: "Sign up for our mailing list!",
             Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
             ButtonText: "Sign up!",
@@ -37,6 +34,7 @@ var Nozzlegear = (function () {
         this._form = document.createElement("div");
         this._form.classList.add("Nozzlegear-container");
         this._form.classList.add("Nozzlegear-hide");
+        this._form.classList.add("Nozzlegear-untoggled");
         this._form.style.maxHeight = "0px";
         this._form.style.backgroundColor = this.options.BackgroundColor;
         this._form.innerHTML = this._template;
@@ -62,10 +60,26 @@ var Nozzlegear = (function () {
         document.body.appendChild(this._form);
         //Get the error element
         this._errorElement = this._form.querySelector("p.Nozzlegear-error");
+        //Acquire cookie data
+        this._cookieValue = (function () {
+            var output;
+            try {
+                output = JSON.parse(_this._getCookie("Nozzlegear-" + _this.options.UniqueId + "-form"));
+            }
+            catch (e) {
+                output = {
+                    HasConverted: false,
+                    HasInteracted: false,
+                };
+            }
+            ;
+            return output;
+        })();
     }
     Nozzlegear.prototype.Open = function () {
         //Ensure the form itself is shown
         this._form.classList.remove("Nozzlegear-hide");
+        this._form.classList.remove("Nozzlegear-untoggled");
         this._form.style.maxHeight = "600px";
         this._isOpen = true;
         this._hasBeenShow = true;
@@ -73,6 +87,7 @@ var Nozzlegear = (function () {
     };
     Nozzlegear.prototype.Close = function () {
         this._form.style.maxHeight = this._form.querySelector(".Nozzlegear-header").offsetHeight + "px";
+        this._form.classList.add("Nozzlegear-untoggled");
         this._isOpen = false;
         return this;
     };
@@ -80,13 +95,15 @@ var Nozzlegear = (function () {
         var _this = this;
         if (!this._isStarted) {
             this._isStarted = true;
-            // TODO: Only auto show if ShowPopupIfConverted is true or user has not converted
-            if (this.options.ShowPopupIfConverted || true) {
+            //Only auto show if ShowPopupIfConverted is true or user has not converted
+            if (this.options.ShowPopupIfConverted || !this._cookieValue.HasConverted) {
                 //Show popup's title tab
                 this._form.classList.remove("Nozzlegear-hide");
                 this._form.style.maxHeight = this._form.querySelector(".Nozzlegear-header").offsetHeight + "px";
-                //TODO: Only auto open if AutoOpenIfPreviouslySeen is true
-                if (true) {
+                //Only auto open if AutoOpenIfPreviouslySeen is true, user has not open/closed popup or device width indicates mobile
+                if ((this.options.AutoOpenIfPreviouslyInteracted || !this._cookieValue.HasInteracted) && this._deviceWidth > 830) {
+                    console.log("Auto open?", this.options.AutoOpenIfPreviouslyInteracted);
+                    console.log("Has interacted?", this._cookieValue.HasInteracted);
                     //Check if we should automatically open the popup
                     if (this.options.AutoOpenDelay < 0) {
                     }
@@ -138,6 +155,7 @@ var Nozzlegear = (function () {
             Position: this._propertyExists(options && options.Position, "string") ? options.Position : this._defaultOptions.Position,
             UniqueId: this._propertyExists(options && options.UniqueId, "string") ? options.UniqueId : this._defaultOptions.UniqueId,
             ShowPopupIfConverted: this._propertyExists(options && options.ShowPopupIfConverted, "boolean") ? options.ShowPopupIfConverted : this._defaultOptions.ShowPopupIfConverted,
+            AutoOpenIfPreviouslyInteracted: this._propertyExists(options && options.AutoOpenIfPreviouslyInteracted, "boolean") ? options.AutoOpenIfPreviouslyInteracted : this._defaultOptions.AutoOpenIfPreviouslyInteracted,
             FormOptions: this._checkFormDefaults(options && options.FormOptions),
             Title: this._propertyExists(options && options.Title, "string") ? options.Title : this._defaultOptions.Title,
             Message: this._propertyExists(options && options.Message, "string") ? options.Message : this._defaultOptions.Message,
@@ -221,12 +239,17 @@ var Nozzlegear = (function () {
         }
         ;
     };
+    Nozzlegear.prototype._saveCookieData = function () {
+        this._setCookie("Nozzlegear-" + this.options.UniqueId + "-form", JSON.stringify(this._cookieValue), 365 * 10);
+    };
     Nozzlegear.prototype._toggle = function (e) {
         e.preventDefault();
         if (!this._isOpen) {
             this.Open();
         }
         else {
+            this._cookieValue.HasInteracted = true;
+            this._saveCookieData();
             this.Close();
         }
         ;
@@ -246,8 +269,12 @@ var Nozzlegear = (function () {
                 FullName: this._form.querySelector("div.Nozzlegear-fullname-capture > input").value,
             };
             //Wait for the handler to return true before submitting the form
-            if (this.options.OnConversion(innerForm, controls))
+            if (this.options.OnConversion(innerForm, controls)) {
+                this._cookieValue.HasConverted = true;
+                this._saveCookieData();
                 this._form.getElementsByTagName("form").item(0).submit();
+            }
+            ;
         }
         ;
     };

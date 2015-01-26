@@ -20,6 +20,9 @@
   <ItemGroup>
     <Content Include="Nozzlegear.css" />
     <Content Include="index.html" />
+    <Content Include="Nozzlegear.min.css">
+      <DependentUpon>Nozzlegear.css</DependentUpon>
+    </Content>
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>

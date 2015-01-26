@@ -47,6 +47,8 @@
     .Nozzlegear-content > p.Nozzlegear-message {
         margin: 0 0 15px 0 !important;
         font-size: 14px !important;
+        font-family: 'Segoe UI', sans-serif !important;
+        font-weight: 400!important;
     }
 
 .Nozzlegear-form {
@@ -57,6 +59,8 @@
     }
 
         .Nozzlegear-form > .Nozzlegear-form-group > input {
+            font-family: 'Segoe UI', sans-serif !important;
+            font-weight: 400!important;
             display: block !important;
             width: 100% !important;
             font-size: 14px !important;
@@ -90,12 +94,13 @@
             }
 
     .Nozzlegear-form > .Nozzlegear-button {
+        font-family: 'Segoe UI', sans-serif !important;
+        font-weight: 400!important;
         border: 1px solid !important;
         margin: 15px 0 0 0 !important;
         padding: 6px 12px !important;
         font-size: 14px !important;
         display: inline-block !important;
-        font-weight: 400 !important;
         color: #ffffff !important;
         background-color: #337ab7 !important;
         border-color: #2e6da4 !important;
@@ -109,6 +114,8 @@
     }
 
     .Nozzlegear-form > p.Nozzlegear-error {
+        font-family: 'Segoe UI', sans-serif !important;
+        font-weight: 400!important;
         color: #ff0000 !important;
         margin: 10px 0 0 0 !important;
         font-size: 14px !important;
@@ -127,6 +134,8 @@ a.Nozzlegear-toggle {
 }
 
     a.Nozzlegear-toggle > h2 {
+        font-family: 'Segoe UI', sans-serif !important;
+        font-weight: 400!important;
         margin: 0 !important;
         padding: 0 !important;
         padding-right: 20px !important;

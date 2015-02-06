@@ -1,7 +1,7 @@
 # Nozzlegear
 Nozzlegear is an open-source Javascript library that will help you capture more leads with email opt-in forms.
 
-**This project is a work-in-progress, but is nearing a 1.0 release. Check the /dev branch for current progress.**
+**This project is a work-in-progress, but is nearing a 1.0 release. Check the [/dev](https://github.com/asyncwords/nozzlegear/tree/dev) branch for current progress.**
 
 ##Usage
 

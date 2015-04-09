@@ -1,5 +1,5 @@
-# Nozzlegear
-Nozzlegear is an open-source Javascript library that will help you capture more leads with email opt-in forms.
+# Riddlevox
+Riddlevox is an open-source Javascript library that will help you capture more leads with email opt-in forms.
 
 **This project is a work-in-progress, but is nearing a 1.0 release. Check the [/dev](https://github.com/asyncwords/nozzlegear/tree/dev) branch for current progress.**
 
@@ -37,10 +37,10 @@ var options = {
     OpenDelay: 5000, //Controls when the popup will open. Set to 0 for immediately, -1 for never.
 };
 
-//Initialize and start Nozzlegear
-var gear = new Nozzlegear(options).Start();
+//Initialize and start Riddlevox
+var vox = new Riddlevox(options).Start();
 
 //Manually open and close the popup
-gear.Open();
-gear.Hide();
+vox.Open();
+vox.Hide();
 ```

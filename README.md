@@ -1,5 +1,5 @@
-# Nozzlegear
-Nozzlegear is an open-source Javascript library that will help you capture more leads with email opt-in forms.
+# Riddlevox
+Riddlevox is an open-source Javascript library that will help you capture more leads with email opt-in forms.
 
 ##Usage
 
@@ -11,7 +11,7 @@ For proper display on mobile, you must set the meta viewport tag:
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 ```
 
-By default, Nozzlegear will not automatically show a popup if the user has converted (subscribed to your list, etc.). Pass in a UniqueId to differentiate between different popups.
+By default, Riddlevox will not automatically show a popup if the user has converted (subscribed to your list, etc.). Pass in a UniqueId to differentiate between different popups.
 
 ``` 
 var uniqueId = "mainPageMailingList";
@@ -23,7 +23,7 @@ Set ShowPopupIfConverted to true to always show the popup, even if the user has 
 var showPopupIfConverted = false;
 ```
 
-Nozzlegear can be set to automatically open itself using the AutoOpenDelay property. However, if a user manually opens or closes the popup it will not automatically open again. You can override this behavior and force the popup to always automatically open.
+Riddlevox can be set to automatically open itself using the AutoOpenDelay property. However, if a user manually opens or closes the popup it will not automatically open again. You can override this behavior and force the popup to always automatically open.
 
 **NB**: The popup will NEVER auto open if the user is on a mobile device &mdash; even if this property is true.
 
@@ -31,7 +31,7 @@ Nozzlegear can be set to automatically open itself using the AutoOpenDelay prope
 var autoOpenIfPreviouslyInteracted: false;
 ```
 
-Configure the rest of the options and then start Nozzlegear:
+Configure the rest of the options and then start Riddlevox:
 
 ```
 var options = {
@@ -78,10 +78,10 @@ var options = {
     AutoOpenDelay: 5000, //Controls when the popup will automatically open. Set to 0 for immediately, -1 for never.
 };
 
-//Initialize and start Nozzlegear
-var gear = new Nozzlegear(options).Start();
+//Initialize and start Riddlevox
+var vox = new Riddlevox(options).Start();
 
 //Manually open and close the popup if your settings do not allow it to auto open.
-gear.Open();
-gear.Hide();
+vox.Open();
+vox.Hide();
 ```

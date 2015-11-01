@@ -14,7 +14,7 @@ For proper display on mobile, the target website must have set a meta viewport t
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 ```
 
-### Configuration Riddlevox
+### Configuring Riddlevox
 
 Riddlevox can be configured with the following options, by passing them in as an object to the Riddlevox constructor:
 

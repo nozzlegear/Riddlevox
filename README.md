@@ -44,7 +44,7 @@ var options =
 
 ### new Riddlevox() and vox.Start()
 
-Before you can use Riddlevox, you must construct a new instance of it while passing in the options. and then call `Start` to show its unopened tab on the page.
+Before you can use Riddlevox, you must construct a new instance of it while passing in the options. 
 
 ```js
 var vox = new Riddlevox(options);

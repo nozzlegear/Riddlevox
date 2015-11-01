@@ -16,17 +16,15 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="Nozzlegear.css" />
     <Content Include="index.html" />
-    <Content Include="Nozzlegear.min.css">
-      <DependentUpon>Nozzlegear.css</DependentUpon>
-    </Content>
+    <Content Include="Riddlevox.css" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Nozzlegear.ts" />
+    <TypeScriptCompile Include="Riddlevox.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.Debug.config">
@@ -48,7 +46,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>5918</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

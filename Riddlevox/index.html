@@ -3,44 +3,36 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Nozzlegear Test Page</title>
+    <title>Riddlevox Test Page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="Nozzlegear.css" rel="stylesheet" />
+    <link href="Riddlevox.css" rel="stylesheet" />
 </head>
 <body>
-    <h1>Nozzlegear Test Page</h1>
+    <h1>Riddlevox Test Page</h1>
 
     <hr style="margin:50px 0;" />
 
     <div class="hide">
-        <script src="Nozzlegear.js"></script>
+        <script src="Riddlevox.js"></script>
         <script type="text/javascript">
             var options = {
-                Title: "Sending shipments with ASP.NET and C#",
-                ButtonText: "Wololo!",
-                ShowPopupIfConverted: true,
-                AutoOpenIfPreviouslyInteracted: true,
-                FormOptions: {
-                    ActionUrl: "",
-                    Method: "get",
-                    FullNameControlName: "FULLNAME",
-                    EmailAddressControlName: "LNAME",
-                    CaptureFullName: true,
-                    CaptureFirstName: false
-                },
-                OnConversion: function (form, controls) {
-                    if (!controls.FullName) {
-                        gear.ShowError("Please enter your first name.");
-                    } else if (!controls.EmailAddress || controls.EmailAddress.indexOf("@") === -1 || controls.EmailAddress.indexOf(".") === -1) {
-                        gear.ShowError("Please enter a valid email address.");
+                Title: "Build rock-solid Shopify apps with ASP.NET!",
+                ButtonText: "Send me the free chapter!",
+                BackgroundColor: "#2980B9",
+                OnConversion: (fname, email, vox) =>
+                {
+                    if (!fname || !email)
+                    {
+                        vox.ShowError("You must enter a valid first name and email address.");
+
+                        return;
                     }
-                    else {
-                        return true;
-                    }
-                },
-                InitialDelay: 0
+
+                    vox.ShowThankYouMessage();
+                }
             };
-            var gear = new Nozzlegear(options).Start();
+
+            var vox = new Riddlevox(options).Start();
         </script>
     </div>
 </body>

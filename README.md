@@ -1,87 +1,137 @@
 # Riddlevox
-Riddlevox is an open-source Javascript library that will help you capture more leads with email opt-in forms.
+
+Riddlevox is an open-source TypeScript widget that will help you capture more leads with email opt-in forms. This is a rough and untested widget, built in a couple of hours to be used solely for demonstrating the power of Shopify's script tag API. 
+
+**Do not use this widget in production, it has not been extensively tested.**
+
+![Riddlevox](https://zippy.gfycat.com/WelloffShadowyDuckling.gif)
 
 ##Usage
 
-**NB:** This section will be updated with better documentation upon the 1.0 release.
+For proper display on mobile, the target website must have set a meta viewport tag with `width=device-width, initiali-scale=1.0`. This will already be set on Shopify store fronts, unless the store has explicitly installed a goofy, mobile-hostile theme.
 
-For proper display on mobile, you must set the meta viewport tag:
-
-```
+```html
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 ```
 
-By default, Riddlevox will not automatically show a popup if the user has converted (subscribed to your list, etc.). Pass in a UniqueId to differentiate between different popups.
+### Configuration Riddlevox
 
-``` 
-var uniqueId = "mainPageMailingList";
-```
+Riddlevox can be configured with the following options, by passing them in as an object to the Riddlevox constructor:
 
-Set ShowPopupIfConverted to true to always show the popup, even if the user has already triggered the OnConversion event.
-
-```
-var showPopupIfConverted = false;
-```
-
-Riddlevox can be set to automatically open itself using the AutoOpenDelay property. However, if a user manually opens or closes the popup it will not automatically open again. You can override this behavior and force the popup to always automatically open.
-
-**NB**: The popup will NEVER auto open if the user is on a mobile device &mdash; even if this property is true.
-
-```
-var autoOpenIfPreviouslyInteracted: false;
-```
-
-Configure the rest of the options and then start Riddlevox:
-
-```
-var options = {
+```js
+var options = 
+{
     Position: "bottom-right",
-    UniqueId: uniqueId,
-    ShowPopupIfConverted: showPopupIfConverted,
-    AutoOpenIfPreviouslyInteracted: autoOpenIfPreviouslyInteracted,
-    Title: "Hello, world!",
-    Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    Title: "Sign up for our mailing list!",
+    Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     ButtonText: "Sign up!",
+    ThankYouMessage: "Thank you! Your subscription to our mailing list has been confirmed.",
     BackgroundColor: "#34495e",
-    FormOptions: {
-        ActionUrl: "",
-        Method: "get",
-        FirstNameControlName: "FNAME",
-        EmailAddressControlName: "LNAME",
-        CaptureEmailAddress: true,
-        CaptureFirstName: true,
-        CaptureFullName: false,
-        CaptureLastName: false,
-    },
-    OnConversion: function (form, controls) {
-        //Called when the user clicks the button. 
-        console.log("Conversion!");
-        
-        //Validate control values:
-        if(controls.FullName !== "Josh Harms"){
-        	gear.ShowError("Your name is not Josh Harms!");
-        }
-        else if(controls.FirstName !== "Josh"){
-        	gear.ShowError("Your first name is not Josh!");
-        }
-        else if(controls.LastName !== "Harms"){
-        	gear.ShowError("Your last name is not Harms!");
-        }
-        else if(controls.EmailAddress !== "joshua@nozzlegear.com"){
-        	gear.ShowError("Your email address is not joshua@nozzlegear.com!");
-        }
-        else{
-	        //Return true to submit the form.
-	        return true;
-        };
-    },
-    AutoOpenDelay: 5000, //Controls when the popup will automatically open. Set to 0 for immediately, -1 for never.
-};
+    OnConversion: function (firstName, emailAddress, vox) {
+        console.log("Conversion received.", firstName, emailAddress);
 
-//Initialize and start Riddlevox
-var vox = new Riddlevox(options).Start();
+        if (!fname || !email)
+        {
+            vox.ShowError("You must enter a valid first name and email address.");
 
-//Manually open and close the popup if your settings do not allow it to auto open.
-vox.Open();
-vox.Hide();
+            return;
+        }
+
+        vox.ShowThankYouMessage();
+    }
+}
 ```
+
+### new Riddlevox() and vox.Start()
+
+Before you can use Riddlevox, you must construct a new instance of it while passing in the options. and then call `Start` to show its unopened tab on the page.
+
+```js
+var vox = new Riddlevox(options);
+
+//Show Riddlevox's unopened tab on the page.
+vox.Start();
+```
+
+At this point, nothing will be displayed even though Riddlevox has been added to the page's DOM. Call `vox.Start()` to show the title tab.
+
+```js
+//Show Riddlevox's title tab.
+vox.Start();
+```
+
+Clicking on the title tab will open and close Riddlevox's form.
+
+### vox.Open() and vox.Close()
+
+While the user can click on Riddlevox's title tab to open and close the form, you can also open and close it programatically.
+
+```js
+//Open Riddlevox's form
+vox.Open();
+
+//Close Riddlevox's form
+vox.Close();
+```
+
+### vox.ShowError() and vox.HideError()
+
+Riddlevox lets you show or hide an error message on its form. It should be used when validating their email details after they've submitted the form.
+
+```js
+//Show an error on Riddlevox's form.
+vox.ShowError("Please enter a valid email address.");
+
+//Hide that error
+vox.HideError();
+```
+
+`vox.HideError` will be called automatically by Riddlevox each time the user submits the form.
+
+### vox.ShowThankYouMessage()
+
+After the user has submitted their details, assuming it passes your validation, you can show the previously configured thank-you message. This will hide Riddlevox's email capture form and display the thank-you message in place of it.
+
+```js
+vox.ShowThankYouMessage();
+```
+
+### vox.Options.OnConversion()
+
+Configure your `OnConversion` handler by setting it in Riddlevox's options. When the user submits Riddlevox's email capture form, your `OnConversion` handler will be called and receive the user's first name, their email address and the instance of Riddlevox that owns the form.
+
+This is a great time to validate the information they've provided, show an error message if necessary, or else show the thank-you message.
+
+```js
+var options = 
+{
+    ...
+    OnConversion: function (firstName, emailAddress, vox) {
+        console.log("Conversion received.", firstName, emailAddress);
+
+        if (!fname || !email)
+        {
+            vox.ShowError("You must enter a valid first name and email address.");
+
+            return;
+        }
+
+        vox.ShowThankYouMessage();
+    },
+    ...
+}
+```
+
+### vox.Destroy()
+
+If you want to completely remove Riddlevox from the page, including Riddlevox's title tab, you can use this method. Note that after destroying Riddlevox, you must create and start a new instance to use it again.
+
+```js
+vox.Destroy();
+```
+
+# Learn how to build rock-solid Shopify apps with C# and ASP.NET
+
+Riddlevox was built to showcase the power of Shopify's script tag API, which lets you inject your own, custom scripts and JS libraries onto a Shopify store's website. It's a great way to add dynamic functionality or analytics to a merchant's store front. 
+
+I've created a premium course for building rock-solid Shopify apps with C# and ASP.NET, and one of the chapters deals specifically with using custom JavaScript widgets and libraries to add things like Riddlevox to a Shopify store. It's called [The Shopify Development Handbook](https://nozzlegear.com/shopify-development-handbook), and you can get a free preview with real, production-ready code samples by going to [https://nozzlegear.com/shopify-development-handbook](https://nozzlegear.com/shopify-development-handbook). 

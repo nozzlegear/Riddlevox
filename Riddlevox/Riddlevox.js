@@ -1,5 +1,5 @@
-var Nozzlegear = (function () {
-    function Nozzlegear(options) {
+var Riddlevox = (function () {
+    function Riddlevox(options) {
         var _this = this;
         this.options = options;
         //#region Utility variables
@@ -28,43 +28,39 @@ var Nozzlegear = (function () {
             }
         };
         //#region Template
-        this._template = "<div class='Nozzlegear-header'><a class='Nozzlegear-toggle' href='#'><h2 class='Nozzlegear-title'></h2><span class='Nozzlegear-arrow'></span></a></div><div class='Nozzlegear-content'><p class='Nozzlegear-message'></p><form autocomplete='off' class='Nozzlegear-form'><div class='Nozzlegear-form-group Nozzlegear-fname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='First Name' /></div><div class='Nozzlegear-form-group Nozzlegear-lname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Last Name' /></div><div class='Nozzlegear-form-group Nozzlegear-fullname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Full Name' /></div><div class='Nozzlegear-form-group Nozzlegear-email-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Email Address' /></div><p class='Nozzlegear-error Nozzlegear-hide'></p><button class='Nozzlegear-button' type='button'></button></form></div>";
+        this._template = "<div class='Riddlevox-header'><a class='Riddlevox-toggle' href='#'><h2 class='Riddlevox-title'></h2><span class='Riddlevox-arrow'></span></a></div><div class='Riddlevox-content'><p class='Riddlevox-message'></p><form autocomplete='off' class='Riddlevox-form'><div class='Riddlevox-form-group Riddlevox-fname-capture'><input type='text' class='Riddlevox-form-control' placeholder='First Name' /></div><div class='Riddlevox-form-group Riddlevox-lname-capture'><input type='text' class='Riddlevox-form-control' placeholder='Last Name' /></div><div class='Riddlevox-form-group Riddlevox-fullname-capture'><input type='text' class='Riddlevox-form-control' placeholder='Full Name' /></div><div class='Riddlevox-form-group Riddlevox-email-capture'><input type='text' class='Riddlevox-form-control' placeholder='Email Address' /></div><p class='Riddlevox-error Riddlevox-hide'></p><button class='Riddlevox-button' type='button'></button></form></div>";
         this.options = this._checkDefaults(options);
         //Build template and append to body
         this._form = document.createElement("div");
-        this._form.classList.add("Nozzlegear-container");
-        this._form.classList.add("Nozzlegear-hide");
-        this._form.classList.add("Nozzlegear-untoggled");
+        this._form.classList.add("Riddlevox-container");
+        this._form.classList.add("Riddlevox-hide");
+        this._form.classList.add("Riddlevox-untoggled");
         this._form.style.maxHeight = "0px";
         this._form.style.backgroundColor = this.options.BackgroundColor;
         this._form.innerHTML = this._template;
         //Determine position
         if (this.options.Position === "bottom-left")
-            this._form.classList.add("Nozzlegear-bottom-left");
+            this._form.classList.add("Riddlevox-bottom-left");
         if (this.options.Position === "bottom-right")
-            this._form.classList.add("Nozzlegear-bottom-right");
+            this._form.classList.add("Riddlevox-bottom-right");
         //Set the content
-        this._form.getElementsByClassName("Nozzlegear-title").item(0).textContent = this.options.Title;
-        this._form.getElementsByClassName("Nozzlegear-message").item(0).textContent = this.options.Message;
-        this._form.getElementsByClassName("Nozzlegear-button").item(0).textContent = this.options.ButtonText;
+        this._form.getElementsByClassName("Riddlevox-title").item(0).textContent = this.options.Title;
+        this._form.getElementsByClassName("Riddlevox-message").item(0).textContent = this.options.Message;
+        this._form.getElementsByClassName("Riddlevox-button").item(0).textContent = this.options.ButtonText;
         //Configure form options
         this._configureFormOptions(this.options.FormOptions);
         //Wire up click listeners. Lambda syntax preserves 'this'.
-        this._form.getElementsByClassName("Nozzlegear-button").item(0).addEventListener("click", function (e) {
-            _this._onButtonClick(e);
-        }, true);
-        this._form.getElementsByClassName("Nozzlegear-toggle").item(0).addEventListener("click", function (e) {
-            _this._toggle(e);
-        }, true);
+        this._form.getElementsByClassName("Riddlevox-button").item(0).addEventListener("click", function (e) { _this._onButtonClick(e); }, true);
+        this._form.getElementsByClassName("Riddlevox-toggle").item(0).addEventListener("click", function (e) { _this._toggle(e); }, true);
         //Append the form to the document
         document.body.appendChild(this._form);
         //Get the error element
-        this._errorElement = this._form.querySelector("p.Nozzlegear-error");
+        this._errorElement = this._form.querySelector("p.Riddlevox-error");
         //Acquire cookie data
         this._cookieValue = (function () {
             var output;
             try {
-                output = JSON.parse(_this._getCookie("Nozzlegear-" + _this.options.UniqueId + "-form"));
+                output = JSON.parse(_this._getCookie("Riddlevox-" + _this.options.UniqueId + "-form"));
             }
             catch (e) {
                 output = {
@@ -76,30 +72,30 @@ var Nozzlegear = (function () {
             return output;
         })();
     }
-    Nozzlegear.prototype.Open = function () {
+    Riddlevox.prototype.Open = function () {
         //Ensure the form itself is shown
-        this._form.classList.remove("Nozzlegear-hide");
-        this._form.classList.remove("Nozzlegear-untoggled");
+        this._form.classList.remove("Riddlevox-hide");
+        this._form.classList.remove("Riddlevox-untoggled");
         this._form.style.maxHeight = "600px";
         this._isOpen = true;
         this._hasBeenShow = true;
         return this;
     };
-    Nozzlegear.prototype.Close = function () {
-        this._form.style.maxHeight = this._form.querySelector(".Nozzlegear-header").offsetHeight + "px";
-        this._form.classList.add("Nozzlegear-untoggled");
+    Riddlevox.prototype.Close = function () {
+        this._form.style.maxHeight = this._form.querySelector(".Riddlevox-header").offsetHeight + "px";
+        this._form.classList.add("Riddlevox-untoggled");
         this._isOpen = false;
         return this;
     };
-    Nozzlegear.prototype.Start = function () {
+    Riddlevox.prototype.Start = function () {
         var _this = this;
         if (!this._isStarted) {
             this._isStarted = true;
             //Only auto show if ShowPopupIfConverted is true or user has not converted
             if (this.options.ShowPopupIfConverted || !this._cookieValue.HasConverted) {
                 //Show popup's title tab
-                this._form.classList.remove("Nozzlegear-hide");
-                this._form.style.maxHeight = this._form.querySelector(".Nozzlegear-header").offsetHeight + "px";
+                this._form.classList.remove("Riddlevox-hide");
+                this._form.style.maxHeight = this._form.querySelector(".Riddlevox-header").offsetHeight + "px";
                 //Only auto open if AutoOpenIfPreviouslySeen is true, user has not open/closed popup or device width indicates mobile
                 if ((this.options.AutoOpenIfPreviouslyInteracted || !this._cookieValue.HasInteracted) && this._deviceWidth > 830) {
                     console.log("Auto open?", this.options.AutoOpenIfPreviouslyInteracted);
@@ -112,12 +108,9 @@ var Nozzlegear = (function () {
                     }
                     else {
                         //Must use lambda syntax here to preserve 'this' both in the function and in .Show
-                        setTimeout(function () {
-                            if (!_this._hasBeenShow) {
-                                _this.Open();
-                            }
-                            ;
-                        }, this.options.AutoOpenDelay);
+                        setTimeout(function () { if (!_this._hasBeenShow) {
+                            _this.Open();
+                        } ; }, this.options.AutoOpenDelay);
                     }
                     ;
                 }
@@ -128,20 +121,20 @@ var Nozzlegear = (function () {
         ;
         return this;
     };
-    Nozzlegear.prototype.ShowError = function (message) {
+    Riddlevox.prototype.ShowError = function (message) {
         this._errorElement.textContent = message;
-        this._errorElement.classList.remove("Nozzlegear-hide");
+        this._errorElement.classList.remove("Riddlevox-hide");
         return this;
     };
-    Nozzlegear.prototype.HideError = function () {
+    Riddlevox.prototype.HideError = function () {
         this._errorElement.textContent = "";
-        this._errorElement.classList.add("Nozzlegear-hide");
+        this._errorElement.classList.add("Riddlevox-hide");
         return this;
     };
     //#endregion 
     //#endregion
     //#region Utility functions
-    Nozzlegear.prototype._propertyExists = function (property, isTypeOf) {
+    Riddlevox.prototype._propertyExists = function (property, isTypeOf) {
         if (property === null || typeof (property) !== isTypeOf) {
             return false;
         }
@@ -150,7 +143,7 @@ var Nozzlegear = (function () {
         }
         ;
     };
-    Nozzlegear.prototype._checkDefaults = function (options) {
+    Riddlevox.prototype._checkDefaults = function (options) {
         return {
             Position: this._propertyExists(options && options.Position, "string") ? options.Position : this._defaultOptions.Position,
             UniqueId: this._propertyExists(options && options.UniqueId, "string") ? options.UniqueId : this._defaultOptions.UniqueId,
@@ -165,7 +158,7 @@ var Nozzlegear = (function () {
             AutoOpenDelay: this._propertyExists(options && options.AutoOpenDelay, "number") ? options.AutoOpenDelay : this._defaultOptions.AutoOpenDelay,
         };
     };
-    Nozzlegear.prototype._checkFormDefaults = function (options) {
+    Riddlevox.prototype._checkFormDefaults = function (options) {
         return {
             ActionUrl: this._propertyExists(options && options.ActionUrl, "string") ? options.ActionUrl : null,
             Method: this._propertyExists(options && options.Method, "string") ? options.Method : null,
@@ -179,7 +172,7 @@ var Nozzlegear = (function () {
             CaptureFullName: this._propertyExists(options && options.CaptureFullName, "boolean") ? options.CaptureFullName : this._defaultOptions.FormOptions.CaptureFullName,
         };
     };
-    Nozzlegear.prototype._configureFormOptions = function (options) {
+    Riddlevox.prototype._configureFormOptions = function (options) {
         var _this = this;
         var innerForm = this._form.getElementsByTagName("form").item(0);
         //Config functions
@@ -188,7 +181,7 @@ var Nozzlegear = (function () {
             control.setAttribute("name", value);
         };
         var hideControl = function (name) {
-            _this._form.getElementsByClassName(name).item(0).classList.add("Nozzlegear-hide");
+            _this._form.getElementsByClassName(name).item(0).classList.add("Riddlevox-hide");
         };
         //Set attributes
         if (options && options.ActionUrl)
@@ -196,24 +189,24 @@ var Nozzlegear = (function () {
         if (options && options.Method)
             innerForm.method = options.Method;
         if (options && options.EmailAddressControlName)
-            configureControlName("Nozzlegear-email-capture", options.EmailAddressControlName);
+            configureControlName("Riddlevox-email-capture", options.EmailAddressControlName);
         if (options && options.FirstNameControlName)
-            configureControlName("Nozzlegear-fname-capture", options.FirstNameControlName);
+            configureControlName("Riddlevox-fname-capture", options.FirstNameControlName);
         if (options && options.LastNameControlName)
-            configureControlName("Nozzlegear-lname-capture", options.LastNameControlName);
+            configureControlName("Riddlevox-lname-capture", options.LastNameControlName);
         if (options && options.FullNameControlName)
-            configureControlName("Nozzlegear-fullname-capture", options.FullNameControlName);
+            configureControlName("Riddlevox-fullname-capture", options.FullNameControlName);
         //Show or hide form controls
         if (!options.CaptureEmailAddress)
-            hideControl("Nozzlegear-email-capture");
+            hideControl("Riddlevox-email-capture");
         if (!options.CaptureFirstName)
-            hideControl("Nozzlegear-fname-capture");
+            hideControl("Riddlevox-fname-capture");
         if (!options.CaptureLastName)
-            hideControl("Nozzlegear-lname-capture");
+            hideControl("Riddlevox-lname-capture");
         if (!options.CaptureFullName)
-            hideControl("Nozzlegear-fullname-capture");
+            hideControl("Riddlevox-fullname-capture");
     };
-    Nozzlegear.prototype._getCookie = function (name) {
+    Riddlevox.prototype._getCookie = function (name) {
         if (document.cookie.length > 0) {
             var prefix = document.cookie.indexOf(name + "=");
             if (prefix !== -1) {
@@ -228,21 +221,22 @@ var Nozzlegear = (function () {
         ;
         return "";
     };
-    Nozzlegear.prototype._setCookie = function (name, value, expirationInDays) {
+    Riddlevox.prototype._setCookie = function (name, value, expirationInDays) {
         if (value) {
             var exdate = new Date();
             exdate.setDate(exdate.getDate() + expirationInDays);
-            document.cookie = name + "=" + encodeURIComponent(value) + ((expirationInDays === null) ? "" : ";expires=" + exdate.toUTCString());
+            document.cookie = name + "=" + encodeURIComponent(value) +
+                ((expirationInDays === null) ? "" : ";expires=" + exdate.toUTCString());
         }
         else {
             document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
         }
         ;
     };
-    Nozzlegear.prototype._saveCookieData = function () {
-        this._setCookie("Nozzlegear-" + this.options.UniqueId + "-form", JSON.stringify(this._cookieValue), 365 * 10);
+    Riddlevox.prototype._saveCookieData = function () {
+        this._setCookie("Riddlevox-" + this.options.UniqueId + "-form", JSON.stringify(this._cookieValue), 365 * 10);
     };
-    Nozzlegear.prototype._toggle = function (e) {
+    Riddlevox.prototype._toggle = function (e) {
         e.preventDefault();
         if (!this._isOpen) {
             this.Open();
@@ -254,7 +248,7 @@ var Nozzlegear = (function () {
         }
         ;
     };
-    Nozzlegear.prototype._onButtonClick = function (e) {
+    Riddlevox.prototype._onButtonClick = function (e) {
         e.preventDefault();
         //Always hide the error
         this.HideError();
@@ -263,10 +257,10 @@ var Nozzlegear = (function () {
             //Get the form and controls to pass to the developer's handler
             var innerForm = this._form.getElementsByTagName("form").item(0);
             var controls = {
-                EmailAddress: this._form.querySelector("div.Nozzlegear-email-capture > input").value,
-                FirstName: this._form.querySelector("div.Nozzlegear-fname-capture > input").value,
-                LastName: this._form.querySelector("div.Nozzlegear-lname-capture > input").value,
-                FullName: this._form.querySelector("div.Nozzlegear-fullname-capture > input").value,
+                EmailAddress: this._form.querySelector("div.Riddlevox-email-capture > input").value,
+                FirstName: this._form.querySelector("div.Riddlevox-fname-capture > input").value,
+                LastName: this._form.querySelector("div.Riddlevox-lname-capture > input").value,
+                FullName: this._form.querySelector("div.Riddlevox-fullname-capture > input").value,
             };
             //Wait for the handler to return true before submitting the form
             if (this.options.OnConversion(innerForm, controls)) {
@@ -278,6 +272,6 @@ var Nozzlegear = (function () {
         }
         ;
     };
-    return Nozzlegear;
+    return Riddlevox;
 })();
-//# sourceMappingURL=Nozzlegear.js.map
+//# sourceMappingURL=Riddlevox.js.map

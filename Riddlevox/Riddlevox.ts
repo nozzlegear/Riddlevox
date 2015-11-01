@@ -1,12 +1,12 @@
-﻿interface INozzlegear {
-    Open: () => INozzlegear;
-    Close: () => INozzlegear;
-    Start: () => INozzlegear;
-    ShowError: (message: string) => INozzlegear;
-    HideError: () => INozzlegear;
+﻿interface IRiddlevox {
+    Open: () => IRiddlevox;
+    Close: () => IRiddlevox;
+    Start: () => IRiddlevox;
+    ShowError: (message: string) => IRiddlevox;
+    HideError: () => IRiddlevox;
 }
 
-interface INozzlegearFormOptions {
+interface IRiddlevoxFormOptions {
     ActionUrl?: string;
     Method?: string;
     FirstNameControlName?: string;
@@ -19,73 +19,73 @@ interface INozzlegearFormOptions {
     CaptureEmailAddress: boolean;
 }
 
-interface INozzlegearCookieData {
+interface IRiddlevoxCookieData {
     HasConverted: boolean;
     HasInteracted: boolean;
 }
 
-interface INozzlegearOptions {
+interface IRiddlevoxOptions {
     Position: string;
     UniqueId: string;
     ShowPopupIfConverted: boolean;
     AutoOpenIfPreviouslyInteracted: boolean;
-    FormOptions: INozzlegearFormOptions;
+    FormOptions: IRiddlevoxFormOptions;
     Title: string;
     Message: string;
     ButtonText: string;
     BackgroundColor: string;
     AutoOpenDelay: number;
-    OnConversion: (form: HTMLFormElement, controls: INozzlegearControlsToValidate) => boolean;
+    OnConversion: (form: HTMLFormElement, controls: IRiddlevoxControlsToValidate) => boolean;
 }
 
-interface INozzlegearControlsToValidate {
+interface IRiddlevoxControlsToValidate {
     EmailAddress: string;
     FirstName: string;
     LastName: string;
     FullName: string;
 }
 
-class Nozzlegear implements INozzlegear {
-    constructor(private options?: INozzlegearOptions) {
+class Riddlevox implements IRiddlevox {
+    constructor(private options?: IRiddlevoxOptions) {
         this.options = this._checkDefaults(options);
 
         //Build template and append to body
         this._form = document.createElement("div");
-        this._form.classList.add("Nozzlegear-container");
-        this._form.classList.add("Nozzlegear-hide");
-        this._form.classList.add("Nozzlegear-untoggled");
+        this._form.classList.add("Riddlevox-container");
+        this._form.classList.add("Riddlevox-hide");
+        this._form.classList.add("Riddlevox-untoggled");
         this._form.style.maxHeight = "0px";
         this._form.style.backgroundColor = this.options.BackgroundColor;
         this._form.innerHTML = this._template;
 
         //Determine position
-        if (this.options.Position === "bottom-left") this._form.classList.add("Nozzlegear-bottom-left");
-        if (this.options.Position === "bottom-right") this._form.classList.add("Nozzlegear-bottom-right");
+        if (this.options.Position === "bottom-left") this._form.classList.add("Riddlevox-bottom-left");
+        if (this.options.Position === "bottom-right") this._form.classList.add("Riddlevox-bottom-right");
 
         //Set the content
-        this._form.getElementsByClassName("Nozzlegear-title").item(0).textContent = this.options.Title;
-        this._form.getElementsByClassName("Nozzlegear-message").item(0).textContent = this.options.Message;
-        this._form.getElementsByClassName("Nozzlegear-button").item(0).textContent = this.options.ButtonText;
+        this._form.getElementsByClassName("Riddlevox-title").item(0).textContent = this.options.Title;
+        this._form.getElementsByClassName("Riddlevox-message").item(0).textContent = this.options.Message;
+        this._form.getElementsByClassName("Riddlevox-button").item(0).textContent = this.options.ButtonText;
 
         //Configure form options
         this._configureFormOptions(this.options.FormOptions);
 
         //Wire up click listeners. Lambda syntax preserves 'this'.
-        (<HTMLElement>this._form.getElementsByClassName("Nozzlegear-button").item(0)).addEventListener("click", (e) => { this._onButtonClick(e); }, true);
-        (<HTMLElement>this._form.getElementsByClassName("Nozzlegear-toggle").item(0)).addEventListener("click", (e) => { this._toggle(e); }, true);
+        (<HTMLElement>this._form.getElementsByClassName("Riddlevox-button").item(0)).addEventListener("click", (e) => { this._onButtonClick(e); }, true);
+        (<HTMLElement>this._form.getElementsByClassName("Riddlevox-toggle").item(0)).addEventListener("click", (e) => { this._toggle(e); }, true);
 
         //Append the form to the document
         document.body.appendChild(this._form);
 
         //Get the error element
-        this._errorElement = <HTMLParagraphElement> this._form.querySelector("p.Nozzlegear-error");
+        this._errorElement = <HTMLParagraphElement> this._form.querySelector("p.Riddlevox-error");
 
         //Acquire cookie data
         this._cookieValue = (() => {
-            var output: INozzlegearCookieData;
+            var output: IRiddlevoxCookieData;
             
             try {
-                output = JSON.parse(this._getCookie("Nozzlegear-" + this.options.UniqueId + "-form"));
+                output = JSON.parse(this._getCookie("Riddlevox-" + this.options.UniqueId + "-form"));
             }
             catch (e) {
                 output = {
@@ -98,10 +98,10 @@ class Nozzlegear implements INozzlegear {
         })();
     }
 
-    public Open(): INozzlegear {
+    public Open(): IRiddlevox {
         //Ensure the form itself is shown
-        this._form.classList.remove("Nozzlegear-hide");
-        this._form.classList.remove("Nozzlegear-untoggled");
+        this._form.classList.remove("Riddlevox-hide");
+        this._form.classList.remove("Riddlevox-untoggled");
         this._form.style.maxHeight = "600px";
         this._isOpen = true;
         this._hasBeenShow = true;
@@ -109,23 +109,23 @@ class Nozzlegear implements INozzlegear {
         return this;
     }
 
-    public Close(): INozzlegear {
-        this._form.style.maxHeight = (<HTMLElement> this._form.querySelector(".Nozzlegear-header")).offsetHeight + "px";
-        this._form.classList.add("Nozzlegear-untoggled");
+    public Close(): IRiddlevox {
+        this._form.style.maxHeight = (<HTMLElement> this._form.querySelector(".Riddlevox-header")).offsetHeight + "px";
+        this._form.classList.add("Riddlevox-untoggled");
         this._isOpen = false;
 
         return this;
     }
 
-    public Start(): INozzlegear {
+    public Start(): IRiddlevox {
         if (!this._isStarted) {
             this._isStarted = true;
 
             //Only auto show if ShowPopupIfConverted is true or user has not converted
             if (this.options.ShowPopupIfConverted || !this._cookieValue.HasConverted) {
                 //Show popup's title tab
-                this._form.classList.remove("Nozzlegear-hide");
-                this._form.style.maxHeight = (<HTMLElement> this._form.querySelector(".Nozzlegear-header")).offsetHeight + "px";
+                this._form.classList.remove("Riddlevox-hide");
+                this._form.style.maxHeight = (<HTMLElement> this._form.querySelector(".Riddlevox-header")).offsetHeight + "px";
 
                 //Only auto open if AutoOpenIfPreviouslySeen is true, user has not open/closed popup or device width indicates mobile
                 if ((this.options.AutoOpenIfPreviouslyInteracted || !this._cookieValue.HasInteracted) && this._deviceWidth > 830) {
@@ -149,16 +149,16 @@ class Nozzlegear implements INozzlegear {
         return this;
     }
 
-    public ShowError(message: string): INozzlegear {
+    public ShowError(message: string): IRiddlevox {
         this._errorElement.textContent = message;
-        this._errorElement.classList.remove("Nozzlegear-hide");
+        this._errorElement.classList.remove("Riddlevox-hide");
 
         return this;
     }
 
-    public HideError(): INozzlegear {
+    public HideError(): IRiddlevox {
         this._errorElement.textContent = "";
-        this._errorElement.classList.add("Nozzlegear-hide");
+        this._errorElement.classList.add("Riddlevox-hide");
 
         return this;
     }
@@ -170,9 +170,9 @@ class Nozzlegear implements INozzlegear {
     private _isOpen: boolean = false;
     private _errorElement: HTMLParagraphElement;
     private _deviceWidth: number = (window.innerWidth > 0) ? window.innerWidth : screen.width;
-    private _cookieValue: INozzlegearCookieData;
+    private _cookieValue: IRiddlevoxCookieData;
 
-    private _defaultOptions: INozzlegearOptions = {
+    private _defaultOptions: IRiddlevoxOptions = {
         Position: "bottom-right",
         UniqueId: "defaultUniqueId4256",
         ShowPopupIfConverted: false,
@@ -197,7 +197,7 @@ class Nozzlegear implements INozzlegear {
 
     //#region Template
 
-    private _template: string = "<div class='Nozzlegear-header'><a class='Nozzlegear-toggle' href='#'><h2 class='Nozzlegear-title'></h2><span class='Nozzlegear-arrow'></span></a></div><div class='Nozzlegear-content'><p class='Nozzlegear-message'></p><form autocomplete='off' class='Nozzlegear-form'><div class='Nozzlegear-form-group Nozzlegear-fname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='First Name' /></div><div class='Nozzlegear-form-group Nozzlegear-lname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Last Name' /></div><div class='Nozzlegear-form-group Nozzlegear-fullname-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Full Name' /></div><div class='Nozzlegear-form-group Nozzlegear-email-capture'><input type='text' class='Nozzlegear-form-control' placeholder='Email Address' /></div><p class='Nozzlegear-error Nozzlegear-hide'></p><button class='Nozzlegear-button' type='button'></button></form></div>";
+    private _template: string = "<div class='Riddlevox-header'><a class='Riddlevox-toggle' href='#'><h2 class='Riddlevox-title'></h2><span class='Riddlevox-arrow'></span></a></div><div class='Riddlevox-content'><p class='Riddlevox-message'></p><form autocomplete='off' class='Riddlevox-form'><div class='Riddlevox-form-group Riddlevox-fname-capture'><input type='text' class='Riddlevox-form-control' placeholder='First Name' /></div><div class='Riddlevox-form-group Riddlevox-lname-capture'><input type='text' class='Riddlevox-form-control' placeholder='Last Name' /></div><div class='Riddlevox-form-group Riddlevox-fullname-capture'><input type='text' class='Riddlevox-form-control' placeholder='Full Name' /></div><div class='Riddlevox-form-group Riddlevox-email-capture'><input type='text' class='Riddlevox-form-control' placeholder='Email Address' /></div><p class='Riddlevox-error Riddlevox-hide'></p><button class='Riddlevox-button' type='button'></button></form></div>";
 
     //#endregion 
 
@@ -213,7 +213,7 @@ class Nozzlegear implements INozzlegear {
         };
     }
 
-    private _checkDefaults(options: INozzlegearOptions): INozzlegearOptions {
+    private _checkDefaults(options: IRiddlevoxOptions): IRiddlevoxOptions {
         return {
             Position: this._propertyExists(options && options.Position, "string") ? options.Position : this._defaultOptions.Position,
             UniqueId: this._propertyExists(options && options.UniqueId, "string") ? options.UniqueId : this._defaultOptions.UniqueId,
@@ -229,7 +229,7 @@ class Nozzlegear implements INozzlegear {
         };
     }
 
-    private _checkFormDefaults(options: INozzlegearFormOptions): INozzlegearFormOptions {
+    private _checkFormDefaults(options: IRiddlevoxFormOptions): IRiddlevoxFormOptions {
         return {
             ActionUrl: this._propertyExists(options && options.ActionUrl, "string") ? options.ActionUrl : null,
             Method: this._propertyExists(options && options.Method, "string") ? options.Method : null,
@@ -244,7 +244,7 @@ class Nozzlegear implements INozzlegear {
         };
     }
 
-    private _configureFormOptions(options: INozzlegearFormOptions) {
+    private _configureFormOptions(options: IRiddlevoxFormOptions) {
         var innerForm = this._form.getElementsByTagName("form").item(0);
 
         //Config functions
@@ -253,22 +253,22 @@ class Nozzlegear implements INozzlegear {
             control.setAttribute("name", value);
         };
         var hideControl = (name: string) => {
-            (<HTMLElement> this._form.getElementsByClassName(name).item(0)).classList.add("Nozzlegear-hide");
+            (<HTMLElement> this._form.getElementsByClassName(name).item(0)).classList.add("Riddlevox-hide");
         };
 
         //Set attributes
         if (options && options.ActionUrl) innerForm.action = options.ActionUrl;
         if (options && options.Method) innerForm.method = options.Method;
-        if (options && options.EmailAddressControlName) configureControlName("Nozzlegear-email-capture", options.EmailAddressControlName);
-        if (options && options.FirstNameControlName) configureControlName("Nozzlegear-fname-capture", options.FirstNameControlName);
-        if (options && options.LastNameControlName) configureControlName("Nozzlegear-lname-capture", options.LastNameControlName);
-        if (options && options.FullNameControlName) configureControlName("Nozzlegear-fullname-capture", options.FullNameControlName);
+        if (options && options.EmailAddressControlName) configureControlName("Riddlevox-email-capture", options.EmailAddressControlName);
+        if (options && options.FirstNameControlName) configureControlName("Riddlevox-fname-capture", options.FirstNameControlName);
+        if (options && options.LastNameControlName) configureControlName("Riddlevox-lname-capture", options.LastNameControlName);
+        if (options && options.FullNameControlName) configureControlName("Riddlevox-fullname-capture", options.FullNameControlName);
 
         //Show or hide form controls
-        if (!options.CaptureEmailAddress) hideControl("Nozzlegear-email-capture");
-        if (!options.CaptureFirstName) hideControl("Nozzlegear-fname-capture");
-        if (!options.CaptureLastName) hideControl("Nozzlegear-lname-capture");
-        if (!options.CaptureFullName) hideControl("Nozzlegear-fullname-capture");
+        if (!options.CaptureEmailAddress) hideControl("Riddlevox-email-capture");
+        if (!options.CaptureFirstName) hideControl("Riddlevox-fname-capture");
+        if (!options.CaptureLastName) hideControl("Riddlevox-lname-capture");
+        if (!options.CaptureFullName) hideControl("Riddlevox-fullname-capture");
     }
 
     private _getCookie(name: string) {
@@ -298,7 +298,7 @@ class Nozzlegear implements INozzlegear {
     }
 
     private _saveCookieData() {
-        this._setCookie("Nozzlegear-" + this.options.UniqueId + "-form", JSON.stringify(this._cookieValue), 365 * 10);
+        this._setCookie("Riddlevox-" + this.options.UniqueId + "-form", JSON.stringify(this._cookieValue), 365 * 10);
     }
 
     private _toggle(e: MouseEvent) {
@@ -325,11 +325,11 @@ class Nozzlegear implements INozzlegear {
         if (this.options.OnConversion) {
             //Get the form and controls to pass to the developer's handler
             var innerForm = this._form.getElementsByTagName("form").item(0);
-            var controls: INozzlegearControlsToValidate = {
-                EmailAddress: (<HTMLInputElement> this._form.querySelector("div.Nozzlegear-email-capture > input")).value,
-                FirstName: (<HTMLInputElement> this._form.querySelector("div.Nozzlegear-fname-capture > input")).value,
-                LastName: (<HTMLInputElement> this._form.querySelector("div.Nozzlegear-lname-capture > input")).value,
-                FullName: (<HTMLInputElement> this._form.querySelector("div.Nozzlegear-fullname-capture > input")).value,
+            var controls: IRiddlevoxControlsToValidate = {
+                EmailAddress: (<HTMLInputElement> this._form.querySelector("div.Riddlevox-email-capture > input")).value,
+                FirstName: (<HTMLInputElement> this._form.querySelector("div.Riddlevox-fname-capture > input")).value,
+                LastName: (<HTMLInputElement> this._form.querySelector("div.Riddlevox-lname-capture > input")).value,
+                FullName: (<HTMLInputElement> this._form.querySelector("div.Riddlevox-fullname-capture > input")).value,
             };
 
             //Wait for the handler to return true before submitting the form

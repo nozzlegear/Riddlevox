@@ -67,8 +67,8 @@ var options = {
         else if(controls.LastName !== "Harms"){
         	gear.ShowError("Your last name is not Harms!");
         }
-        else if(controls.EmailAddress !== "joshua@asyncbuild.com"){
-        	gear.ShowError("Your email address is not joshua@asyncbuild.com!");
+        else if(controls.EmailAddress !== "joshua@nozzlegear.com"){
+        	gear.ShowError("Your email address is not joshua@nozzlegear.com!");
         }
         else{
 	        //Return true to submit the form.

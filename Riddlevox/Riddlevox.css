@@ -140,6 +140,7 @@ a.Riddlevox-toggle {
         padding: 0 !important;
         padding-right: 20px !important;
         font-size: 15px !important;
+		color:#ffffff !important;
     }
 
 .Riddlevox-container > .Riddlevox-header > a.Riddlevox-toggle > span.Riddlevox-arrow {

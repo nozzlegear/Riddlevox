@@ -120,7 +120,7 @@ class Riddlevox implements IRiddlevox
     /**
     The click handler called when the user submits the form.
     */
-    private OnFormSubmit = (e: MouseEvent) =>
+    private OnFormSubmit: (e: MouseEvent) => void = e =>
     {
         e.preventDefault();
 
@@ -149,7 +149,7 @@ class Riddlevox implements IRiddlevox
     /**
     Starts Riddlevox by adding its closed tab to the page.
     */
-    public Start = () =>
+    public Start: () => Riddlevox = () =>
     {
         if (this.IsStarted && !this.IsDestroyed)
         {
@@ -174,7 +174,7 @@ class Riddlevox implements IRiddlevox
     /**
     Stops and destroys Riddlevox, completely removing the form from th epage.
     */
-    public Destroy = () =>
+    public Destroy: () => void = () =>
     {
         this.IsDestroyed = true;
 
@@ -184,7 +184,7 @@ class Riddlevox implements IRiddlevox
     /**
     Opens Riddlevox's form. This will automatically start Riddlevox if it hasn't been started.
     */
-    public Open = (e?: Event) =>
+    public Open: (e?: Event) => Riddlevox = e =>
     {
         if (e)
         {
@@ -212,7 +212,7 @@ class Riddlevox implements IRiddlevox
     /**
     Closes Riddlevox's form. 
     */
-    public Close = (e?: Event) =>
+    public Close: (e?: Event) => Riddlevox = e =>
     {
         if (e)
         {
@@ -234,7 +234,7 @@ class Riddlevox implements IRiddlevox
     /**
     Toggles Riddlevox's form open or close.
     */
-    public Toggle = (e?: Event) =>
+    public Toggle: (e?: Event) => void = e =>
     {
         if (e)
         {
@@ -259,7 +259,7 @@ class Riddlevox implements IRiddlevox
     /**
     Displays an error message on Riddlevox's form.
     */
-    public ShowError = (message: string) =>
+    public ShowError: (message: string) => Riddlevox = message =>
     {
         this.ErrorElement.textContent = message;
         this.ErrorElement.classList.remove("Riddlevox-hide");
@@ -270,7 +270,7 @@ class Riddlevox implements IRiddlevox
     /**
     Hides Riddlevox's error message.
     */
-    public HideError = () =>
+    public HideError: () => Riddlevox = () =>
     {
         this.ErrorElement.textContent = "";
         this.ErrorElement.classList.add("Riddlevox-hide");
@@ -281,7 +281,7 @@ class Riddlevox implements IRiddlevox
     /**
     Removes Riddlevox's form and displays its thank-you message.
     */
-    public ShowThankYouMessage = () =>
+    public ShowThankYouMessage: () => Riddlevox = () =>
     {
         // Hide the unconverted element and show the converted element
         this.formQuery(".Riddlevox-unconverted").classList.add("Riddlevox-hide");

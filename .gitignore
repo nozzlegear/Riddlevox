@@ -185,3 +185,6 @@ FakesAssemblies/
 # IDE files
 .vs
 .idea
+
+# Ignore compiled files
+dist

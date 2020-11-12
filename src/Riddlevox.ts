@@ -39,17 +39,17 @@ class Riddlevox implements IRiddlevox
         this.Form.classList.add(this.Options.Position === "bottom-left" ? "Riddlevox-bottom-left" : "Riddlevox-bottom-right");
 
         //Set the content
-        this.Form.querySelector(".Riddlevox-title").textContent = this.Options.Title;
-        this.Form.querySelector(".Riddlevox-message").textContent = this.Options.Message;
-        this.Form.querySelector(".Riddlevox-button").textContent = this.Options.ButtonText;
-        this.Form.querySelector(".Riddlevox-thanks").textContent = this.Options.ThankYouMessage;
+        this.formQuery(".Riddlevox-title").textContent = this.Options.Title;
+        this.formQuery(".Riddlevox-message").textContent = this.Options.Message;
+        this.formQuery(".Riddlevox-button").textContent = this.Options.ButtonText;
+        this.formQuery(".Riddlevox-thanks").textContent = this.Options.ThankYouMessage;
 
         //Wire up click listeners. Lambda syntax preserves 'this'.
-        this.Form.querySelector(".Riddlevox-button").addEventListener("click", this.OnFormSubmit);
-        this.Form.querySelector(".Riddlevox-toggle").addEventListener("click", this.Toggle); 
+        this.formQuery(".Riddlevox-button").addEventListener("click", this.OnFormSubmit);
+        this.formQuery(".Riddlevox-toggle").addEventListener("click", this.Toggle); 
 
         //Save the error element
-        this.ErrorElement = this.Form.querySelector("p.Riddlevox-error");
+        this.ErrorElement = this.formQuery("p.Riddlevox-error");
 
         //Add the form to the body, hidden until .Start or .Open are called.
         document.body.appendChild(this.Form);
@@ -83,6 +83,16 @@ class Riddlevox implements IRiddlevox
     //#endregion
 
     //#region Utility functions and listeners
+    
+    private formQuery = <T extends HTMLElement = HTMLElement>(selector: string) => {
+        const el = this.Form.querySelector(selector);
+        
+        if (!el) {
+            throw new Error("Could not find form element with selector " + selector);
+        }
+        
+        return el as T;
+    }
 
     /**
     Configure default options and merge developer-given options.
@@ -273,8 +283,9 @@ class Riddlevox implements IRiddlevox
     */
     public ShowThankYouMessage = () =>
     {
-        this.Form.querySelector(".Riddlevox-unconverted").classList.add("Riddlevox-hide");
-        this.Form.querySelector(".Riddlevox-converted").classList.remove("Riddlevox-hide");
+        // Hide the unconverted element and show the converted element
+        this.formQuery(".Riddlevox-unconverted").classList.add("Riddlevox-hide");
+        this.formQuery(".Riddlevox-converted").classList.remove("Riddlevox-hide");
 
         return this;
     }

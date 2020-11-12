@@ -22,9 +22,9 @@ interface IRiddlevoxOptions
 
 class Riddlevox implements IRiddlevox
 {
-    constructor(private Options?: IRiddlevoxOptions)
+    constructor(options?: IRiddlevoxOptions)
     {
-        this.Options = this.ConfigureDefaults(Options);
+        this.Options = this.ConfigureDefaults(options);
 
         //Build template and append to body
         this.Form = document.createElement("div");
@@ -56,6 +56,8 @@ class Riddlevox implements IRiddlevox
     }
 
     //#region Utility variables
+    
+    private Options: IRiddlevoxOptions;
 
     private IsStarted = false;
 
@@ -85,24 +87,24 @@ class Riddlevox implements IRiddlevox
     /**
     Configure default options and merge developer-given options.
     */
-    private ConfigureDefaults(options: IRiddlevoxOptions): IRiddlevoxOptions
+    private ConfigureDefaults: (options?: IRiddlevoxOptions) => IRiddlevoxOptions = options =>
     {
-        var output: IRiddlevoxOptions = {
+        const defaults: IRiddlevoxOptions = {
             Position: "bottom-right",
             Title: "Sign up for our mailing list!",
             Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
             ButtonText: "Sign up!",
             ThankYouMessage: "Thank you! Your subscription to our mailing list has been confirmed.",
             BackgroundColor: "#34495e",
-            OnConversion: null
+            OnConversion: (firstName, emailAddress, vox) => {
+                console.log(`Received conversion: ${firstName} ${emailAddress}`);
+            }
         };
-
-        for (var attrName in options)
-        {
-            output[attrName] = options[attrName];
+        
+        return {
+            ...options as IRiddlevoxOptions, 
+            defaults
         }
-
-        return output;
     }
 
     /**

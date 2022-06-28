@@ -2,7 +2,7 @@
   "name": "@nozzlegear/riddlevox",
   "version": "2.0.0",
   "description": "An email capture widget that can be loaded onto a Shopify store. Built as part of The Shopify Development Handbook learning course on building Shopify apps (https://nozzlegear.com/shopify-development-handbook)",
-  "main": "src/Riddlevox.ts",
+  "main": "dist/index.js",
   "repository": "git@github.com:nozzlegear/riddlevox",
   "author": "Joshua Harms <joshua@nozzlegear.com>",
   "license": "MIT",

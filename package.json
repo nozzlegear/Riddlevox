@@ -9,7 +9,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "tsc -p ." 
+    "build": "tsc -p .",
+    "prepack": "npm run build"
   },
   "devDependencies": {
     "typescript": "^4.0.5"

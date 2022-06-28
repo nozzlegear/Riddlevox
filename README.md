@@ -6,6 +6,14 @@ Riddlevox is an open-source TypeScript widget that will help you capture more le
 
 ![Riddlevox](https://zippy.gfycat.com/WelloffShadowyDuckling.gif)
 
+## Installation
+
+You can install this package using [npm](https://npmjs.com/@nozzlegear/riddlevox):
+
+```
+npm install @nozzlegear/riddlevox --save
+```
+
 ##Usage
 
 For proper display on mobile, the target website must have set a meta viewport tag with `width=device-width, initiali-scale=1.0`. This will already be set on Shopify store fronts, unless the store has explicitly installed a goofy, mobile-hostile theme.
@@ -19,115 +27,117 @@ For proper display on mobile, the target website must have set a meta viewport t
 Riddlevox can be configured with the following options, by passing them in as an object to the Riddlevox constructor:
 
 ```js
-var options = 
+const options = 
 {
-    Position: "bottom-right",
-    Title: "Sign up for our mailing list!",
-    Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    ButtonText: "Sign up!",
-    ThankYouMessage: "Thank you! Your subscription to our mailing list has been confirmed.",
-    BackgroundColor: "#34495e",
-    OnConversion: function (firstName, emailAddress, vox) {
+    position: "bottom-right",
+    title: "Sign up for our mailing list!",
+    message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    buttonText: "Sign up!",
+    thankYouMessage: "Thank you! Your subscription to our mailing list has been confirmed.",
+    backgroundColor: "#34495e",
+    onConversion: function (firstName, emailAddress, vox) {
         console.log("Conversion received.", firstName, emailAddress);
 
         if (!fname || !email)
         {
-            vox.ShowError("You must enter a valid first name and email address.");
+            vox.showError("You must enter a valid first name and email address.");
 
             return;
         }
 
-        vox.ShowThankYouMessage();
+        vox.showThankYouMessage();
     }
 }
 ```
 
-### new Riddlevox() and vox.Start()
+### new Riddlevox() and vox.start()
 
 Before you can use Riddlevox, you must construct a new instance of it while passing in the options. 
 
 ```js
-var vox = new Riddlevox(options);
+import { RiddleVox } from "@nozzlegear/riddlevox";
+
+const vox = new Riddlevox(options);
 
 //Show Riddlevox's unopened tab on the page.
-vox.Start();
+vox.start();
 ```
 
-At this point, nothing will be displayed even though Riddlevox has been added to the page's DOM. Call `vox.Start()` to show the title tab.
+At this point, nothing will be displayed even though Riddlevox has been added to the page's DOM. Call `vox.start()` to show the title tab.
 
 ```js
 //Show Riddlevox's title tab.
-vox.Start();
+vox.start();
 ```
 
 Clicking on the title tab will open and close Riddlevox's form.
 
-### vox.Open() and vox.Close()
+### vox.open() and vox.close()
 
 While the user can click on Riddlevox's title tab to open and close the form, you can also open and close it programatically.
 
 ```js
 //Open Riddlevox's form
-vox.Open();
+vox.open();
 
 //Close Riddlevox's form
-vox.Close();
+vox.close();
 ```
 
-### vox.ShowError() and vox.HideError()
+### vox.showError() and vox.hideError()
 
 Riddlevox lets you show or hide an error message on its form. It should be used when validating their email details after they've submitted the form.
 
 ```js
 //Show an error on Riddlevox's form.
-vox.ShowError("Please enter a valid email address.");
+vox.showError("Please enter a valid email address.");
 
 //Hide that error
-vox.HideError();
+vox.hideError();
 ```
 
-`vox.HideError` will be called automatically by Riddlevox each time the user submits the form.
+`vox.hideError` will be called automatically by Riddlevox each time the user submits the form.
 
-### vox.ShowThankYouMessage()
+### vox.showThankYouMessage()
 
 After the user has submitted their details, assuming it passes your validation, you can show the previously configured thank-you message. This will hide Riddlevox's email capture form and display the thank-you message in place of it.
 
 ```js
-vox.ShowThankYouMessage();
+vox.showThankYouMessage();
 ```
 
-### vox.Options.OnConversion()
+### vox.options.onConversion()
 
-Configure your `OnConversion` handler by setting it in Riddlevox's options. When the user submits Riddlevox's email capture form, your `OnConversion` handler will be called and receive the user's first name, their email address and the instance of Riddlevox that owns the form.
+Configure your `onConversion` handler by setting it in Riddlevox's options. When the user submits Riddlevox's email capture form, your `onConversion` handler will be called and receive the user's first name, their email address and the instance of Riddlevox that owns the form.
 
 This is a great time to validate the information they've provided, show an error message if necessary, or else show the thank-you message.
 
 ```js
-var options = 
+const options = 
 {
     ...
-    OnConversion: function (firstName, emailAddress, vox) {
+    onConversion: function (firstName, emailAddress, vox) {
         console.log("Conversion received.", firstName, emailAddress);
 
         if (!fname || !email)
         {
-            vox.ShowError("You must enter a valid first name and email address.");
+            vox.showError("You must enter a valid first name and email address.");
 
             return;
         }
 
-        vox.ShowThankYouMessage();
+        vox.showThankYouMessage();
     },
     ...
 }
 ```
 
-### vox.Destroy()
+### vox.destroy()
 
 If you want to completely remove Riddlevox from the page, including Riddlevox's title tab, you can use this method. Note that after destroying Riddlevox, you must create and start a new instance to use it again.
 
 ```js
-vox.Destroy();
+vox.destroy();
 ```
 
 # Learn how to build rock-solid Shopify apps with C# and ASP.NET

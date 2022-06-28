@@ -1,6 +1,6 @@
 {
   "name": "@nozzlegear/riddlevox",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "An email capture widget that can be loaded onto a Shopify store. Built as part of The Shopify Development Handbook learning course on building Shopify apps (https://nozzlegear.com/shopify-development-handbook)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

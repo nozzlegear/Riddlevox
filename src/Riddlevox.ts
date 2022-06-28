@@ -1,91 +1,87 @@
-﻿interface IRiddlevox
+﻿export interface IRiddlevox
 {
-    Open: () => IRiddlevox;
-    Close: () => IRiddlevox;
-    Start: () => IRiddlevox;
-    Destroy: () => void;
-    ShowError: (message: string) => IRiddlevox;
-    HideError: () => IRiddlevox;
-    ShowThankYouMessage: () => IRiddlevox;
+    open: () => IRiddlevox;
+    close: () => IRiddlevox;
+    start: () => IRiddlevox;
+    destroy: () => void;
+    showError: (message: string) => IRiddlevox;
+    hideError: () => IRiddlevox;
+    showThankYouMessage: () => IRiddlevox;
 }
 
-interface IRiddlevoxOptions
+export interface IRiddlevoxOptions
 {
-    Position: string;
-    Title: string;
-    Message: string;
-    ButtonText: string;
-    BackgroundColor: string;
-    ThankYouMessage: string;
-    OnConversion: (firstName: string, emailAddress: string, vox: Riddlevox) => void;
+    position: string;
+    title: string;
+    message: string;
+    buttonText: string;
+    backgroundColor: string;
+    thankYouMessage: string;
+    onConversion: (firstName: string, emailAddress: string, vox: Riddlevox) => void;
 }
 
 class Riddlevox implements IRiddlevox
 {
-    constructor(options?: IRiddlevoxOptions)
-    {
-        this.Options = this.ConfigureDefaults(options);
+    constructor(options?: IRiddlevoxOptions) {
+        this.options = this.configureDefaults(options);
 
         //Build template and append to body
-        this.Form = document.createElement("div");
-        this.Form.classList.add("Riddlevox-container");
-        this.Form.classList.add("Riddlevox-hide");
-        this.Form.classList.add("Riddlevox-untoggled");
-        this.Form.style.maxHeight = "0px";
-        this.Form.style.backgroundColor = this.Options.BackgroundColor;
-        this.Form.innerHTML = this.Template;
+        this.form = document.createElement("div");
+        this.form.classList.add("Riddlevox-container");
+        this.form.classList.add("Riddlevox-hide");
+        this.form.classList.add("Riddlevox-untoggled");
+        this.form.style.maxHeight = "0px";
+        this.form.style.backgroundColor = this.options.backgroundColor;
+        this.form.innerHTML = this.template;
 
         //Determine position
-        this.Form.classList.add(this.Options.Position === "bottom-left" ? "Riddlevox-bottom-left" : "Riddlevox-bottom-right");
+        this.form.classList.add(this.options.position === "bottom-left" ? "Riddlevox-bottom-left" : "Riddlevox-bottom-right");
 
         //Set the content
-        this.formQuery(".Riddlevox-title").textContent = this.Options.Title;
-        this.formQuery(".Riddlevox-message").textContent = this.Options.Message;
-        this.formQuery(".Riddlevox-button").textContent = this.Options.ButtonText;
-        this.formQuery(".Riddlevox-thanks").textContent = this.Options.ThankYouMessage;
+        this.formQuery(".Riddlevox-title").textContent = this.options.title;
+        this.formQuery(".Riddlevox-message").textContent = this.options.message;
+        this.formQuery(".Riddlevox-button").textContent = this.options.buttonText;
+        this.formQuery(".Riddlevox-thanks").textContent = this.options.thankYouMessage;
 
         //Wire up click listeners. Lambda syntax preserves 'this'.
-        this.formQuery(".Riddlevox-button").addEventListener("click", this.OnFormSubmit);
-        this.formQuery(".Riddlevox-toggle").addEventListener("click", this.Toggle); 
+        this.formQuery(".Riddlevox-button").addEventListener("click", this.onFormSubmit);
+        this.formQuery(".Riddlevox-toggle").addEventListener("click", this.toggle); 
 
         //Save the error element
-        this.ErrorElement = this.formQuery("p.Riddlevox-error");
+        this.errorElement = this.formQuery("p.Riddlevox-error");
 
-        //Add the form to the body, hidden until .Start or .Open are called.
-        document.body.appendChild(this.Form);
+        //Add the form to the body, hidden until .start or .open are called.
+        document.body.appendChild(this.form);
     }
-
-    //#region Utility variables
     
-    private Options: IRiddlevoxOptions;
+    private options: IRiddlevoxOptions;
 
-    private IsStarted = false;
+    private isStarted = false;
 
-    private IsDestroyed = false;
+    private isDestroyed = false;
 
-    private IsOpen = false;
+    private isOpen = false;
 
     /**
     Riddlevox's error paragraph.
     */
-    private ErrorElement: Element;
+    private errorElement: Element;
 
     /**
     Riddlevox's form element.
     */
-    private Form: HTMLElement;
+    private form: HTMLElement;
 
     /**
     Riddlevox's HTML template.
     */
-    private Template: string = "<div class='Riddlevox-header'><a class='Riddlevox-toggle' href='#'><h2 class='Riddlevox-title'></h2><span class='Riddlevox-arrow'></span></a></div><div class='Riddlevox-content'><div class='Riddlevox-unconverted'><p class='Riddlevox-message'></p><form autocomplete='off' class='Riddlevox-form'><div class='Riddlevox-form-group Riddlevox-fname-capture'><input type='text' class='Riddlevox-form-control Riddlevox-fname' placeholder='First Name' /></div><div class='Riddlevox-form-group Riddlevox-email-capture'><input type='text' class='Riddlevox-form-control Riddlevox-email' placeholder='Email Address' /></div><p class='Riddlevox-error Riddlevox-hide'></p><button class='Riddlevox-button' type='button'></button></form></div><div class='Riddlevox-converted Riddlevox-hide'><p class='Riddlevox-thanks'></p></div></div>";
-
-    //#endregion
-
-    //#region Utility functions and listeners
+    private template: string = "<div class='Riddlevox-header'><a class='Riddlevox-toggle' href='#'><h2 class='Riddlevox-title'></h2><span class='Riddlevox-arrow'></span></a></div><div class='Riddlevox-content'><div class='Riddlevox-unconverted'><p class='Riddlevox-message'></p><form autocomplete='off' class='Riddlevox-form'><div class='Riddlevox-form-group Riddlevox-fname-capture'><input type='text' class='Riddlevox-form-control Riddlevox-fname' placeholder='First Name' /></div><div class='Riddlevox-form-group Riddlevox-email-capture'><input type='text' class='Riddlevox-form-control Riddlevox-email' placeholder='Email Address' /></div><p class='Riddlevox-error Riddlevox-hide'></p><button class='Riddlevox-button' type='button'></button></form></div><div class='Riddlevox-converted Riddlevox-hide'><p class='Riddlevox-thanks'></p></div></div>";
     
+    /**
+     * Queries riddlevox's form.
+     */
     private formQuery = <T extends HTMLElement = HTMLElement>(selector: string) => {
-        const el = this.Form.querySelector(selector);
+        const el = this.form.querySelector(selector);
         
         if (!el) {
             throw new Error("Could not find form element with selector " + selector);
@@ -97,16 +93,16 @@ class Riddlevox implements IRiddlevox
     /**
     Configure default options and merge developer-given options.
     */
-    private ConfigureDefaults: (options?: IRiddlevoxOptions) => IRiddlevoxOptions = options =>
+    private configureDefaults: (options?: IRiddlevoxOptions) => IRiddlevoxOptions = options =>
     {
         const defaults: IRiddlevoxOptions = {
-            Position: "bottom-right",
-            Title: "Sign up for our mailing list!",
-            Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-            ButtonText: "Sign up!",
-            ThankYouMessage: "Thank you! Your subscription to our mailing list has been confirmed.",
-            BackgroundColor: "#34495e",
-            OnConversion: (firstName, emailAddress, vox) => {
+            position: "bottom-right",
+            title: "Sign up for our mailing list!",
+            message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            buttonText: "Sign up!",
+            thankYouMessage: "Thank you! Your subscription to our mailing list has been confirmed.",
+            backgroundColor: "#34495e",
+            onConversion: (firstName, emailAddress, _) => {
                 console.log(`Received conversion: ${firstName} ${emailAddress}`);
             }
         };
@@ -120,53 +116,49 @@ class Riddlevox implements IRiddlevox
     /**
     The click handler called when the user submits the form.
     */
-    private OnFormSubmit: (e: MouseEvent) => void = e =>
+    private onFormSubmit: (e: MouseEvent) => void = e =>
     {
         e.preventDefault();
 
         //Always hide the error
-        this.HideError();
+        this.hideError();
 
         //Invoke the developer's OnConversion handler if it exists
-        if (this.Options.OnConversion)
+        if (typeof this.options.onConversion === "function")
         {
-            var name = (<HTMLInputElement>this.Form.querySelector("input.Riddlevox-fname")).value;
-            var email = (<HTMLInputElement>this.Form.querySelector("input.Riddlevox-email")).value;
+            var name = (<HTMLInputElement>this.form.querySelector("input.Riddlevox-fname")).value;
+            var email = (<HTMLInputElement>this.form.querySelector("input.Riddlevox-email")).value;
 
-            this.Options.OnConversion(name, email, this);
+            this.options.onConversion(name, email, this);
 
             return;
         };
 
         //Otherwise, do nothing and show the thank-you message.
-        this.ShowThankYouMessage();
+        this.showThankYouMessage();
     }
-
-    //#endregion
-
-    //#region Public vox methods
 
     /**
     Starts Riddlevox by adding its closed tab to the page.
     */
-    public Start: () => Riddlevox = () =>
+    public start: () => Riddlevox = () =>
     {
-        if (this.IsStarted && !this.IsDestroyed)
+        if (this.isStarted && !this.isDestroyed)
         {
             return this;
         };
 
-        if (this.IsDestroyed)
+        if (this.isDestroyed)
         {
             //Return a new version of the form
-            return new Riddlevox(this.Options).Start();
+            return new Riddlevox(this.options).start();
         };
 
-        this.IsStarted = true;
+        this.isStarted = true;
         
         //Show popup's title tab 
-        this.Form.classList.remove("Riddlevox-hide");
-        this.Form.style.maxHeight = (<HTMLElement>this.Form.querySelector(".Riddlevox-header")).offsetHeight + "px";
+        this.form.classList.remove("Riddlevox-hide");
+        this.form.style.maxHeight = (<HTMLElement>this.form.querySelector(".Riddlevox-header")).offsetHeight + "px";
 
         return this;
     };
@@ -174,37 +166,37 @@ class Riddlevox implements IRiddlevox
     /**
     Stops and destroys Riddlevox, completely removing the form from th epage.
     */
-    public Destroy: () => void = () =>
+    public destroy: () => void = () =>
     {
-        this.IsDestroyed = true;
+        this.isDestroyed = true;
 
-        this.Form.remove();
+        this.form.remove();
     };
 
     /**
     Opens Riddlevox's form. This will automatically start Riddlevox if it hasn't been started.
     */
-    public Open: (e?: Event) => Riddlevox = e =>
+    public open: (e?: Event) => Riddlevox = e =>
     {
         if (e)
         {
             e.preventDefault();
         }
 
-        if (!this.IsStarted)
+        if (!this.isStarted)
         {
-            this.Start();
+            this.start();
         };
 
-        if (this.IsDestroyed)
+        if (this.isDestroyed)
         {
             throw new Error("Riddlevox has been destroyed. Please create a new instance of Riddlevox.");
         }
 
         //Open the form.
-        this.Form.classList.remove("Riddlevox-untoggled");
-        this.Form.style.maxHeight = "600px";
-        this.IsOpen = true;
+        this.form.classList.remove("Riddlevox-untoggled");
+        this.form.style.maxHeight = "600px";
+        this.isOpen = true;
 
         return this;
     }
@@ -212,21 +204,21 @@ class Riddlevox implements IRiddlevox
     /**
     Closes Riddlevox's form. 
     */
-    public Close: (e?: Event) => Riddlevox = e =>
+    public close: (e?: Event) => Riddlevox = e =>
     {
         if (e)
         {
             e.preventDefault();
         }
 
-        if (this.IsDestroyed)
+        if (this.isDestroyed)
         {
             throw new Error("Riddlevox has been destroyed. Please create a new instance of Riddlevox.");
         }
 
-        this.Form.style.maxHeight = (<HTMLElement>this.Form.querySelector(".Riddlevox-header")).offsetHeight + "px";
-        this.Form.classList.add("Riddlevox-untoggled");
-        this.IsOpen = false;
+        this.form.style.maxHeight = (<HTMLElement>this.form.querySelector(".Riddlevox-header")).offsetHeight + "px";
+        this.form.classList.add("Riddlevox-untoggled");
+        this.isOpen = false;
 
         return this;
     }
@@ -234,35 +226,35 @@ class Riddlevox implements IRiddlevox
     /**
     Toggles Riddlevox's form open or close.
     */
-    public Toggle: (e?: Event) => void = e =>
+    public toggle: (e?: Event) => void = e =>
     {
         if (e)
         {
             e.preventDefault();
         }
 
-        if (this.IsDestroyed)
+        if (this.isDestroyed)
         {
             throw new Error("Riddlevox has been destroyed. Please create a new instance of Riddlevox.");
         }
 
-        if (!this.IsOpen)
+        if (!this.isOpen)
         {
-            this.Open();
+            this.open();
 
             return;
         }
 
-        this.Close();
+        this.close();
     }
 
     /**
     Displays an error message on Riddlevox's form.
     */
-    public ShowError: (message: string) => Riddlevox = message =>
+    public showError: (message: string) => Riddlevox = message =>
     {
-        this.ErrorElement.textContent = message;
-        this.ErrorElement.classList.remove("Riddlevox-hide");
+        this.errorElement.textContent = message;
+        this.errorElement.classList.remove("Riddlevox-hide");
 
         return this;
     }
@@ -270,10 +262,10 @@ class Riddlevox implements IRiddlevox
     /**
     Hides Riddlevox's error message.
     */
-    public HideError: () => Riddlevox = () =>
+    public hideError: () => Riddlevox = () =>
     {
-        this.ErrorElement.textContent = "";
-        this.ErrorElement.classList.add("Riddlevox-hide");
+        this.errorElement.textContent = "";
+        this.errorElement.classList.add("Riddlevox-hide");
 
         return this;
     }
@@ -281,7 +273,7 @@ class Riddlevox implements IRiddlevox
     /**
     Removes Riddlevox's form and displays its thank-you message.
     */
-    public ShowThankYouMessage: () => Riddlevox = () =>
+    public showThankYouMessage: () => Riddlevox = () =>
     {
         // Hide the unconverted element and show the converted element
         this.formQuery(".Riddlevox-unconverted").classList.add("Riddlevox-hide");
@@ -289,6 +281,4 @@ class Riddlevox implements IRiddlevox
 
         return this;
     }
-
-    //#endregion
 }

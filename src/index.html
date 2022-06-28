@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title>Riddlevox Test Page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="Riddlevox.css" rel="stylesheet" />
+    <link href="riddlevox.css" rel="stylesheet" />
 </head>
 <body>
     <h1>Riddlevox Test Page</h1>
@@ -13,13 +13,13 @@
     <hr style="margin:50px 0;" />
 
     <div class="hide">
-        <script src="Riddlevox.js"></script>
+        <script src="riddlevox.js"></script>
         <script type="text/javascript">
             var options = {
-                Title: "Build rock-solid Shopify apps with ASP.NET!",
-                ButtonText: "Send me the free chapter!",
-                BackgroundColor: "#2980B9",
-                OnConversion: (fname, email, vox) =>
+                title: "Build rock-solid Shopify apps with ASP.NET!",
+                buttonText: "Send me the free chapter!",
+                backgroundColor: "#2980B9",
+                onConversion: (fname, email, vox) =>
                 {
                     if (!fname || !email)
                     {
@@ -28,11 +28,11 @@
                         return;
                     }
 
-                    vox.ShowThankYouMessage();
+                    vox.showThankYouMessage();
                 }
             };
 
-            var vox = new Riddlevox(options).Start();
+            var vox = new Riddlevox(options).start();
         </script>
     </div>
 </body>

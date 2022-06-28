@@ -22,7 +22,7 @@ export interface IRiddlevoxOptions {
   ) => void;
 }
 
-class Riddlevox implements IRiddlevox {
+export class Riddlevox implements IRiddlevox {
   constructor(options?: IRiddlevoxOptions) {
     this.options = this.configureDefaults(options);
 

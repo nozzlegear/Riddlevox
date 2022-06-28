@@ -7,7 +7,6 @@
   "repository": "git@github.com:nozzlegear/riddlevox",
   "author": "Joshua Harms <joshua@nozzlegear.com>",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "build": "tsc -p .",
     "prepack": "npm run build"

@@ -1,4 +1,6 @@
-﻿export interface IRiddlevox {
+﻿declare const require: (path: string) => any;
+
+export interface IRiddlevox {
   open: () => IRiddlevox;
   close: () => IRiddlevox;
   start: () => IRiddlevox;
@@ -15,6 +17,11 @@ export interface IRiddlevoxOptions {
   buttonText: string;
   backgroundColor: string;
   thankYouMessage: string;
+  /**
+   * Whether Riddlevox should inject its own CSS style tag onto the page.
+   * @default false
+   */
+  injectCss: boolean;
   onConversion: (
     firstName: string,
     emailAddress: string,
@@ -61,6 +68,11 @@ export class Riddlevox implements IRiddlevox {
 
     //Add the form to the body, hidden until .start or .open are called.
     document.body.appendChild(this.form);
+
+    // Add the Riddlevox css to the page if necessary
+    if (this.options.injectCss) {
+      this.injectCss();
+    }
   }
 
   private options: IRiddlevoxOptions;
@@ -117,6 +129,7 @@ export class Riddlevox implements IRiddlevox {
       thankYouMessage:
         "Thank you! Your subscription to our mailing list has been confirmed.",
       backgroundColor: "#34495e",
+      injectCss: false,
       onConversion: (firstName, emailAddress, _) => {
         console.log(`Received conversion: ${firstName} ${emailAddress}`);
       },
@@ -126,6 +139,19 @@ export class Riddlevox implements IRiddlevox {
       ...(options as IRiddlevoxOptions),
       defaults,
     };
+  };
+
+  /**
+   * Injects the Riddlevox css directly into the page.
+   */
+  private injectCss: () => Riddlevox = () => {
+    const css: string = require("./index.css");
+    const style = document.createElement("style");
+    style.innerHTML = css;
+
+    document.head.appendChild(style);
+
+    return this;
   };
 
   /**

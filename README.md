@@ -35,6 +35,9 @@ const options =
     buttonText: "Sign up!",
     thankYouMessage: "Thank you! Your subscription to our mailing list has been confirmed.",
     backgroundColor: "#34495e",
+    // Whether Riddlevox should inject its own CSS style tag onto the page.
+    // Default value: false
+    injectCss: true,
     onConversion: function (firstName, emailAddress, vox) {
         console.log("Conversion received.", firstName, emailAddress);
 

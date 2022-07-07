@@ -4,7 +4,7 @@ Riddlevox is an open-source TypeScript widget that will help you capture more le
 
 **Do not use this widget in production, it has not been extensively tested.**
 
-![Riddlevox](https://zippy.gfycat.com/WelloffShadowyDuckling.gif)
+![Riddlevox](https://gfycat.com/welloffshadowyduckling.gif)
 
 ## Installation
 

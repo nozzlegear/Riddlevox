@@ -9,7 +9,7 @@
   "license": "MIT",
   "scripts": {
     "validate": "tsc -p . --noEmit",
-    "build": "npm run validate && esbuild src/index.ts --sourcemap --bundle  --format=esm --loader:.css=text --outdir=dist && tsc --emitDeclarationOnly",
+    "build": "npm run validate && node build.mjs && tsc --emitDeclarationOnly",
     "prepack": "npm run build"
   },
   "devDependencies": {

@@ -5,7 +5,6 @@
     <meta charset="utf-8" />
     <title>Riddlevox Test Page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="index.css" rel="stylesheet" />
 </head>
 <body>
     <h1>Riddlevox Test Page</h1>
@@ -13,16 +12,16 @@
     <hr style="margin:50px 0;" />
 
     <div class="hide">
-        <script src="index.js"></script>
-        <script type="text/javascript">
-            var options = {
+        <script type="module">
+            import { Riddlevox } from "../dist/index.js"
+
+            const options = {
                 title: "Build rock-solid Shopify apps with ASP.NET!",
                 buttonText: "Send me the free chapter!",
                 backgroundColor: "#2980B9",
-                onConversion: (fname, email, vox) =>
-                {
-                    if (!fname || !email)
-                    {
+                injectCss: true,
+                onConversion: (fname, email, vox) => {
+                    if (!fname || !email) {
                         vox.ShowError("You must enter a valid first name and email address.");
 
                         return;
@@ -32,7 +31,7 @@
                 }
             };
 
-            var vox = new Riddlevox(options).start();
+            const vox = new Riddlevox(options).start();
         </script>
     </div>
 </body>

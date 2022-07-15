@@ -1,6 +1,4 @@
-﻿declare const require: (path: string) => any;
-
-export interface IRiddlevox {
+﻿export interface IRiddlevox {
   open: () => IRiddlevox;
   close: () => IRiddlevox;
   start: () => IRiddlevox;
@@ -145,9 +143,9 @@ export class Riddlevox implements IRiddlevox {
    * Injects the Riddlevox css directly into the page.
    */
   private injectCss: () => Riddlevox = () => {
-    const css: string = require("./index.css");
     const style = document.createElement("style");
-    style.innerHTML = css;
+
+    style.innerHTML = require("./index.styl");
 
     document.head.appendChild(style);
 

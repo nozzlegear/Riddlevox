@@ -33,7 +33,7 @@ const options =
     title: "Sign up for our mailing list!",
     message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     buttonText: "Sign up!",
-    thankYouMessage: "Thank you! Your subscription to our mailing list has been confirmed.",
+    defaultThankYouMessage: "Thank you! Your subscription to our mailing list has been confirmed.",
     backgroundColor: "#34495e",
     // Whether Riddlevox should inject its own CSS style tag onto the page.
     // Default value: false
@@ -103,10 +103,13 @@ vox.hideError();
 
 ### vox.showThankYouMessage()
 
-After the user has submitted their details, assuming it passes your validation, you can show the previously configured thank-you message. This will hide Riddlevox's email capture form and display the thank-you message in place of it.
+After the user has submitted their details, assuming it passes your validation, you can show the previously configured default thank-you message, or you can pass in a custom message with dynamic information. This will hide Riddlevox's email capture form and display the thank-you message in place of it.
 
 ```js
+// Show the default thank-you message
 vox.showThankYouMessage();
+// Show a custom thank-you message with dynamic information like the user's first name
+vox.showThankYouMessage(`Thanks for joining our mailing list, ${firstName}!`); 
 ```
 
 ### vox.options.onConversion()

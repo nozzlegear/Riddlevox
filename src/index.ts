@@ -5,7 +5,7 @@
   destroy: () => void;
   showError: (message: string) => IRiddlevox;
   hideError: () => IRiddlevox;
-  showThankYouMessage: () => IRiddlevox;
+  showThankYouMessage: (message?: string) => IRiddlevox;
 }
 
 export interface IRiddlevoxOptions {
@@ -14,7 +14,7 @@ export interface IRiddlevoxOptions {
   message: string;
   buttonText: string;
   backgroundColor: string;
-  thankYouMessage: string;
+  defaultThankYouMessage: string;
   /**
    * Whether Riddlevox should inject its own CSS style tag onto the page.
    * @default false
@@ -51,8 +51,7 @@ export class Riddlevox implements IRiddlevox {
     this.formQuery(".Riddlevox-title").textContent = this.options.title;
     this.formQuery(".Riddlevox-message").textContent = this.options.message;
     this.formQuery(".Riddlevox-button").textContent = this.options.buttonText;
-    this.formQuery(".Riddlevox-thanks").textContent =
-      this.options.thankYouMessage;
+    this.setThankYoumessage(this.options.defaultThankYouMessage);
 
     //Wire up click listeners. Lambda syntax preserves 'this'.
     this.formQuery(".Riddlevox-button").addEventListener(
@@ -124,7 +123,7 @@ export class Riddlevox implements IRiddlevox {
       message:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
       buttonText: "Sign up!",
-      thankYouMessage:
+      defaultThankYouMessage:
         "Thank you! Your subscription to our mailing list has been confirmed.",
       backgroundColor: "#34495e",
       injectCss: false,
@@ -148,6 +147,15 @@ export class Riddlevox implements IRiddlevox {
     style.innerHTML = require("./index.styl");
 
     document.head.appendChild(style);
+
+    return this;
+  };
+
+  /**
+   * Updates the thank you message text.
+   */
+  private setThankYoumessage: (message: string) => Riddlevox = (message) => {
+    this.formQuery(".Riddlevox-thanks").textContent = message;
 
     return this;
   };
@@ -307,7 +315,10 @@ export class Riddlevox implements IRiddlevox {
   /**
     Removes Riddlevox's form and displays its thank-you message.
     */
-  public showThankYouMessage: () => Riddlevox = () => {
+  public showThankYouMessage: (message?: string) => Riddlevox = (message) => {
+    // Update the thank-you message or reset it to the default
+    this.setThankYoumessage(message ?? this.options.defaultThankYouMessage);
+
     // Hide the unconverted element and show the converted element
     this.formQuery(".Riddlevox-unconverted").classList.add("Riddlevox-hide");
     this.formQuery(".Riddlevox-converted").classList.remove("Riddlevox-hide");
